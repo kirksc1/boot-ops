@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group 'com.github.kirksc1.bootops'
@@ -16,4 +17,23 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.register("codeCoverageReport", JacocoReport) {
+    reports {
+        xml.enabled true
+    }
+    subprojects {
+        subproject -> subproject.plugins.withType(JacocoPlugin).configureEach {
+            subproject.tasks.matching({t -> t.extensions.findByType(JacocoTaskExtension) }).configureEach {
+                testTask ->
+                sourceSets subproject.sourceSets.main
+                executionData(testTask)
+            }
+
+            subproject.tasks.matching({ t -> t.extensions.findByType(JacocoTaskExtension) }).forEach {
+                rootProject.tasks.codeCoverageReport.dependsOn(it)
+            }
+        }
+    }
 }
