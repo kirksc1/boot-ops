@@ -44,3 +44,10 @@ jobs:
 
       # run tests!
       - run: gradle test
+
+      - store_test_results:
+          - path: target/surfire-reports
+
+      - run:
+          name: Upload to CodeCov
+          command: bash <(curl -s https://codecov.io/bash)
