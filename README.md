@@ -1,5 +1,6 @@
 # Boot-Ops
-
+[![Build Status](https://travis-ci.org/kirksc1/boot-ops.svg?branch=main)](https://travis-ci.org/kirksc1/boot-ops)
+[![codecov](https://codecov.io/gh/kirksc1/boot-ops/branch/main/graph/badge.svg)](https://codecov.io/gh/kirksc1/boot-ops)
 ## Overview
 Boot-Ops is a framework designed to aid in the creation of [GitOps][gitops] 
 infrastructure automation processes using the [Spring Boot][springboot] platform.
