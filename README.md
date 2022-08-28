@@ -1,5 +1,5 @@
 # Boot-Ops
-[![Build Status](https://travis-ci.org/kirksc1/boot-ops.svg?branch=main)](https://travis-ci.org/kirksc1/boot-ops)
+[![circleci](https://circleci.com/gh/kirksc1/boot-ops.svg?style=svg)](https://circleci.com/gh/kirksc1/boot-ops)
 [![codecov](https://codecov.io/gh/kirksc1/boot-ops/branch/main/graph/badge.svg)](https://codecov.io/gh/kirksc1/boot-ops)
 ## Overview
 Boot-Ops is a framework designed to aid in the creation of [GitOps][gitops] 
