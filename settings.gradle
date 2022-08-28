@@ -1,0 +1,3 @@
+rootProject.name = 'boot-ops'
+include 'boot-ops-core'
+
