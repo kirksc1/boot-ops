@@ -48,8 +48,5 @@ jobs:
       # run tests!
       - run: gradle test
 
-      - store_test_results:
-          path: target/surfire-reports
-
       - codecov/upload
-          file: target/surfire-reports
+          file: build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
