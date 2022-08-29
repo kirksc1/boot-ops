@@ -58,7 +58,7 @@ jobs:
       - run: pwd
 
       - store_test_results:
-          path: ./build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
+          path: boot-ops/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
 
       - codecov/upload:
-          file: ./build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
+          file: boot-ops/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
