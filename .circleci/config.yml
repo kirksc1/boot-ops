@@ -46,15 +46,16 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: gradle dependencies
+      - run: gradlew dependencies
 
       - save_cache:
           paths:
-            - ~/.gradle
+            - ~/.gradlew
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests
-      - run: gradle test
+      - run: gradlew test
+      - run: pwd
 
       - store_test_results:
           path: ./build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
