@@ -1,16 +1,27 @@
 # Java Gradle CircleCI 2.0 configuration file
 # See: https://circleci.com/docs/2.0/language-java/
-version: 2
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@3.2.3
+
+workflows:
+  build:
+    jobs:
+      - build:
+          context:
+            - codecov
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   build:
+
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:8.0
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -35,19 +46,23 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: gradle dependencies
+      - run: ./gradlew dependencies
 
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      # run tests!
-      - run: gradle test
+      # run tests
+      - run: ./gradlew codeCoverageReport
+      - run: pwd
+      - run: ls build
+      - run: ls build/reports
+      - run: ls build/reports/jacoco
+      - run: ls build/reports/jacoco/codeCoverageReport
 
       - store_test_results:
-          path: target/surfire-reports
+          path: build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
 
-      - run:
-          name: Upload to CodeCov
-          command: bash <(curl -s https://codecov.io/bash)
+      - codecov/upload:
+          file: build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
