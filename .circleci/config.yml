@@ -56,7 +56,11 @@ jobs:
       # run tests
       - run: ./gradlew codeCoverageReport
       - run: pwd
-      - run: ls ./boot-ops/build/reports/jacoco/codeCoverageReport
+      - run: ls boot-ops
+      - run: ls boot-ops/build
+      - run: ls boot-ops/build/reports
+      - run: ls boot-ops/build/reports/jacoco
+      - run: ls boot-ops/build/reports/jacoco/codeCoverageReport
 
       - store_test_results:
           path: boot-ops/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
