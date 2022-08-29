@@ -57,7 +57,7 @@ jobs:
       - run: gradle test
 
       - store_test_results:
-          path: build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
+          path: ./build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
 
       - codecov/upload:
-          file: build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
+          file: ./build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
