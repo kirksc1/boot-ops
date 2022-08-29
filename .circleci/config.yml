@@ -54,7 +54,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests
-      - run: ./gradlew test
+      - run: ./gradlew codeCoverageReport
       - run: pwd
 
       - store_test_results:
