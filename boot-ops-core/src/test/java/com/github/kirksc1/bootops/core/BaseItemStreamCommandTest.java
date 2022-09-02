@@ -90,7 +90,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertTrue(success);
         verify(reader, times(1)).read(same(uri));
@@ -116,7 +116,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -141,7 +141,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -166,7 +166,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -191,7 +191,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -216,7 +216,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -241,7 +241,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -273,7 +273,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, Arrays.asList(predicate), publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertTrue(success);
         verify(reader, times(1)).read(same(uri));
@@ -305,7 +305,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, Arrays.asList(predicate), publisher);
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -331,7 +331,7 @@ class BaseItemStreamCommandTest {
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.startBootOpsException = true;
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(0)).read(same(uri));
@@ -357,7 +357,7 @@ class BaseItemStreamCommandTest {
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.startRuntimeException = true;
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(0)).read(same(uri));
@@ -383,7 +383,7 @@ class BaseItemStreamCommandTest {
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.completeBootOpsException = true;
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -410,7 +410,7 @@ class BaseItemStreamCommandTest {
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.completeRuntimeException = true;
 
-        boolean success = command.execute(uriStream, new HashMap<>());
+        boolean success = command.execute(uriStream, new HashMap<>()).isSuccessful();
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
@@ -439,7 +439,7 @@ class BaseItemStreamCommandTest {
         Map<String,String> params = new HashMap<>();
         params.put("1", "one");
         params.put("2", "two");
-        boolean success = command.execute(uriStream, params);
+        boolean success = command.execute(uriStream, params).isSuccessful();
 
         assertTrue(success);
         verify(reader, times(1)).read(same(uri));
@@ -457,6 +457,13 @@ class BaseItemStreamCommandTest {
 
         assertTrue(command.startCalled);
         assertTrue(command.completeCalled);
+    }
+
+    @Test
+    public void testGetName_whenCreatedWithName_thenNameGettable() {
+        TestCommand command = new TestCommand("test", reader, parser, null, publisher);
+
+        assertEquals("test", command.getName());
     }
 
     static class TestCommand extends BaseItemStreamCommand {
@@ -486,7 +493,7 @@ class BaseItemStreamCommandTest {
         }
 
         @Override
-        protected void start() {
+        protected ExecutionResult start() {
             System.out.println("start");
             startCalled = true;
             if (startBootOpsException) {
@@ -495,19 +502,23 @@ class BaseItemStreamCommandTest {
             if (startRuntimeException) {
                 throw new RuntimeException("Forced Failure");
             }
-            super.start();
+            DefaultExecutionResult retVal = (DefaultExecutionResult)super.start();
+            retVal.succeeded();
+            return retVal;
         }
 
         @Override
-        protected void execute(Item item, Map<String,String> parameters) {
+        protected ItemCommandResult execute(Item item, Map<String,String> parameters) {
             System.out.println("execute");
             items.add(item);
             this.parameters.putAll(parameters);
-            super.execute(item, parameters);
+            BaseItemCommandResult retVal = (BaseItemCommandResult) super.execute(item, parameters);
+            retVal.setSuccessful(true);
+            return retVal;
         }
 
         @Override
-        protected void complete() {
+        protected ExecutionResult complete() {
             System.out.println("complete");
             completeCalled = true;
             if (completeBootOpsException) {
@@ -516,7 +527,9 @@ class BaseItemStreamCommandTest {
             if (completeRuntimeException) {
                 throw new RuntimeException("Forced Failure");
             }
-            super.complete();
+            DefaultExecutionResult retVal = (DefaultExecutionResult)super.complete();
+            retVal.succeeded();
+            return retVal;
         }
     }
 }
