@@ -1,5 +1,7 @@
 package com.github.kirksc1.bootops.core;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
@@ -7,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -62,33 +65,35 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * that operates on a single item via execute(Item).
      * @param uriStream The stream of URIs referencing the items.
      * @param parameters A collection of command configuraton parameters.
-     * @return True if everything executed successfully, otherwise false.
+     * @return ItemStreamCommandResult The result of command execution on the stream.
      */
     @Override
-    boolean execute(Stream<URI> uriStream, Map<String,String> parameters) {
-        boolean retVal = false;
+    ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,String> parameters) {
+        ExecutionResult startResult = null;
+        ExecutionResult completeResult = null;
 
-        boolean startSucceeded = doStart();
+        startResult = doStart();
 
-        if (startSucceeded) {
-            boolean executeSucceeded = uriStream
-                    .map(uri -> executeUri(uri, parameters))
-                    .allMatch(succeeded -> succeeded);
+        List<ItemCommandResult> itemCommandResults = new ArrayList<>();
 
-            retVal = doComplete() && executeSucceeded && startSucceeded;
+        if (startResult.isSuccessful()) {
+            uriStream.map(uri -> executeUri(uri, parameters))
+                    .forEach(itemCommandResults::add);
+
+            completeResult = doComplete();
         }
 
-        return retVal;
+        return new BaseItemStreamCommandResult(startResult, itemCommandResults, completeResult);
     }
 
     /**
      * Execute the command on the item referenced by the provided URI.
      * @param uri The URI referencing the item manifest.
      * @param parameters A collection of command configuraton parameters.
-     * @return True if everything executed successfully, otherwise false.
+     * @return ItemCommandResult The result of command execution on the item.
      */
-    private boolean executeUri(URI uri, Map<String,String> parameters) {
-        boolean retVal = false;
+    private ItemCommandResult executeUri(URI uri, Map<String,String> parameters) {
+        ItemCommandResult retVal = null;
         try {
             OutputStream outputStream = reader.read(uri);
             if (outputStream == null) {
@@ -101,75 +106,155 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
             }
 
             if (this.filter.test(item)) {
-                execute(item, parameters);
+                retVal = execute(item, parameters);
                 publisher.publishEvent(new ItemCompletedEvent(this, item));
+            } else {
+                BaseItemCommandResult result = new BaseItemCommandResult();
+                result.setSuccessful(true);
+                retVal = result;
             }
-            retVal = true;
         } catch (IOException e) {
+            retVal = buildItemFailureResult(e);
             publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to read manifest data at URI=" + uri, e)));
         } catch (ParseException e) {
+            retVal = buildItemFailureResult(e);
             publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to parse the manifest data into an Item", e)));
         } catch (BootOpsException e) {
+            retVal = buildItemFailureResult(e);
             publisher.publishEvent(new BootOpsExceptionEvent(this, e));
         } catch (RuntimeException e) {
+            retVal = buildItemFailureResult(e);
             publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to process the Item at URI=" + uri, e)));
         }
         return retVal;
     }
 
     /**
-     * Perform start() activities.
-     * @return True if everything executed successfully, otherwise false.
+     * Build an ItemCommandResult to capture the provided failure.
+     * @param t The failure that occurred.
+     * @return The created ItemCommandResult.
      */
-    protected boolean doStart() {
-        boolean retVal = false;
+    private ItemCommandResult buildItemFailureResult(Throwable t) {
+        BaseItemCommandResult retVal = new BaseItemCommandResult();
+        retVal.setSuccessful(false);
+        retVal.setFailureCause(t);
+        return retVal;
+    }
+
+    /**
+     * Build an ExecutionResult to capture the provided failure.
+     * @param t The failure that occurred.
+     * @return The created ExecutionResult.
+     */
+    private ExecutionResult buildExecutionFailureResult(Throwable t) {
+        DefaultExecutionResult retVal = new DefaultExecutionResult();
+        retVal.failed(t);
+
+        return retVal;
+    }
+
+    /**
+     * Perform start() activities.
+     * @return An ExecutionResult detailing the results of the start execution.
+     */
+    protected ExecutionResult doStart() {
+        ExecutionResult retVal = null;
         try {
-            start();
-            retVal = true;
+            retVal = start();
         } catch (BootOpsException e) {
             publisher.publishEvent(new BootOpsExceptionEvent(this, e));
+            retVal = buildExecutionFailureResult(e);
         } catch (RuntimeException e) {
             publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to finish Start processing successfully", e)));
+            retVal = buildExecutionFailureResult(e);
         }
         return retVal;
     }
 
     /**
      * Perform complete() activities.
-     * @return True if everything executed successfully, otherwise false.
+     * @return An ExecutionResult detailing the results of the complete execution.
      */
-    protected boolean doComplete() {
-        boolean retVal = false;
+    protected ExecutionResult doComplete() {
+        ExecutionResult retVal = null;
         try {
-            complete();
-            retVal = true;
+            retVal = complete();
         } catch (BootOpsException e) {
             publisher.publishEvent(new BootOpsExceptionEvent(this, e));
+            retVal = buildExecutionFailureResult(e);
         } catch (RuntimeException e) {
             publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to finish Complete processing successfully", e)));
+            retVal = buildExecutionFailureResult(e);
         }
         return retVal;
     }
 
     /**
      * Perform logic prior to executing the command on each item.
+     * @return An ExecutionResult detailing the results of the start execution.
      */
-    protected void start() {
+    protected ExecutionResult start() {
         //override to include start logic
+        return new DefaultExecutionResult();
     }
 
     /**
      * Perform command logic on each item.
+     * @param item The item on which to perform the command.
+     * @param parameters The parameters for use by the command when executing on the item.
+     * @return An ExecutionResult detailing the results of the command execution on the item.
      */
-    protected void execute(Item item, Map<String,String> parameters) {
-        //override to include execution logic
+    protected ItemCommandResult execute(Item item, Map<String,String> parameters) {
+        return new BaseItemCommandResult();
     }
 
     /**
      * Perform logic after executing the command on each item.
+     * @return An ExecutionResult detailing the results of the complete execution.
      */
-    protected void complete() {
+    protected ExecutionResult complete() {
         //override to include complete logic
+        return new DefaultExecutionResult();
+    }
+
+    @Getter
+    @Setter
+    static class BaseItemCommandResult implements ItemCommandResult {
+        private boolean successful = false;
+        private Throwable failureCause = null;
+        private Item item = null;
+    }
+
+    /**
+     * An implementation of ItemStreamCommandResult that tracks the execution result of the
+     * start() and complete() processing within the command.
+     */
+    static class BaseItemStreamCommandResult extends ItemStreamCommandResult {
+        private ExecutionResult startResult;
+        private ExecutionResult completeResult;
+
+        /**
+         *
+         * @param startResult The result of the start() processing.
+         * @param itemCommandResults The result of the item processing.
+         * @param completeResult The result of the complete() processing.
+         */
+        public BaseItemStreamCommandResult(ExecutionResult startResult, List<ItemCommandResult> itemCommandResults, ExecutionResult completeResult) {
+            super();
+            this.startResult = startResult;
+            this.completeResult = completeResult;
+            itemCommandResults.stream()
+                    .forEach(this::addResult);
+        }
+
+        /**
+         * Check to see if the result was successful.
+         * @return True if the processing was successful, otherwise false.
+         */
+        @Override
+        public boolean isSuccessful() {
+            return startResult.isSuccessful() && completeResult.isSuccessful() && super.isSuccessful();
+        }
     }
 
 }

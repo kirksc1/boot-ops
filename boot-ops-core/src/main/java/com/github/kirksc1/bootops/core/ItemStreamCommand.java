@@ -1,5 +1,6 @@
 package com.github.kirksc1.bootops.core;
 
+import lombok.Getter;
 import org.springframework.util.Assert;
 
 import java.net.URI;
@@ -9,13 +10,14 @@ import java.util.stream.Stream;
 /**
  * An ItemStreamCommand encapsulates a named command to be executed on a Stream of items referenced by a URI.
  */
+@Getter
 public abstract class ItemStreamCommand {
     private final String name;
 
     /**
      * Construct a new instance with the provided name.
      * @param name The name of the command.
-     * @throws IllegalArgumentException if the name provided is null.
+     * @throws IllegalArgumentException if the name provided is null or emptystring.
      */
     protected ItemStreamCommand(String name) {
         Assert.notNull(name, "The name provided was null");
@@ -28,7 +30,7 @@ public abstract class ItemStreamCommand {
      * Execute the command on each of the items referenced by the provided URIs.
      * @param uriStream The stream of URIs referencing the items.
      * @param parameters A collection of command configuraton parameters.
-     * @return True if everything executed successfully, otherwise false.
+     * @return ItemStreamCommandResult The result of command execution on the stream.
      */
-    abstract boolean execute(Stream<URI> uriStream, Map<String,String> parameters);
+    abstract ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,String> parameters);
 }
