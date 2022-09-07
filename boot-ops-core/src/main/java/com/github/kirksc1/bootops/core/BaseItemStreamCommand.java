@@ -65,22 +65,23 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * that operates on a single item via execute(Item).
      * @param uriStream The stream of URIs referencing the items.
      * @param parameters A collection of command configuraton parameters.
+     * @param context The contextual data for the Item stream.
      * @return ItemStreamCommandResult The result of command execution on the stream.
      */
     @Override
-    ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,String> parameters) {
+    ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,String> parameters, StreamContext context) {
         ExecutionResult startResult = null;
         ExecutionResult completeResult = null;
 
-        startResult = doStart();
+        startResult = doStart(context);
 
         List<ItemCommandResult> itemCommandResults = new ArrayList<>();
 
         if (startResult.isSuccessful()) {
-            uriStream.map(uri -> executeUri(uri, parameters))
+            uriStream.map(uri -> executeUri(uri, parameters, context))
                     .forEach(itemCommandResults::add);
 
-            completeResult = doComplete();
+            completeResult = doComplete(context);
         }
 
         return new BaseItemStreamCommandResult(startResult, itemCommandResults, completeResult);
@@ -90,9 +91,10 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * Execute the command on the item referenced by the provided URI.
      * @param uri The URI referencing the item manifest.
      * @param parameters A collection of command configuraton parameters.
+     * @param context The contextual data for the Item stream.
      * @return ItemCommandResult The result of command execution on the item.
      */
-    private ItemCommandResult executeUri(URI uri, Map<String,String> parameters) {
+    private ItemCommandResult executeUri(URI uri, Map<String,String> parameters, StreamContext context) {
         ItemCommandResult retVal = null;
         try {
             OutputStream outputStream = reader.read(uri);
@@ -106,7 +108,7 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
             }
 
             if (this.filter.test(item)) {
-                retVal = execute(item, parameters);
+                retVal = execute(item, parameters, context);
                 publisher.publishEvent(new ItemCompletedEvent(this, item));
             } else {
                 BaseItemCommandResult result = new BaseItemCommandResult();
@@ -155,12 +157,13 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
 
     /**
      * Perform start() activities.
+     * @param context The contextual data for the Item stream.
      * @return An ExecutionResult detailing the results of the start execution.
      */
-    protected ExecutionResult doStart() {
+    protected ExecutionResult doStart(StreamContext context) {
         ExecutionResult retVal = null;
         try {
-            retVal = start();
+            retVal = start(context);
         } catch (BootOpsException e) {
             publisher.publishEvent(new BootOpsExceptionEvent(this, e));
             retVal = buildExecutionFailureResult(e);
@@ -173,12 +176,13 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
 
     /**
      * Perform complete() activities.
+     * @param context The contextual data for the Item stream.
      * @return An ExecutionResult detailing the results of the complete execution.
      */
-    protected ExecutionResult doComplete() {
+    protected ExecutionResult doComplete(StreamContext context) {
         ExecutionResult retVal = null;
         try {
-            retVal = complete();
+            retVal = complete(context);
         } catch (BootOpsException e) {
             publisher.publishEvent(new BootOpsExceptionEvent(this, e));
             retVal = buildExecutionFailureResult(e);
@@ -191,9 +195,10 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
 
     /**
      * Perform logic prior to executing the command on each item.
+     * @param context The contextual data for the Item stream.
      * @return An ExecutionResult detailing the results of the start execution.
      */
-    protected ExecutionResult start() {
+    protected ExecutionResult start(StreamContext context) {
         //override to include start logic
         return new DefaultExecutionResult();
     }
@@ -202,17 +207,19 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * Perform command logic on each item.
      * @param item The item on which to perform the command.
      * @param parameters The parameters for use by the command when executing on the item.
+     * @param context The contextual data for the Item stream.
      * @return An ExecutionResult detailing the results of the command execution on the item.
      */
-    protected ItemCommandResult execute(Item item, Map<String,String> parameters) {
+    protected ItemCommandResult execute(Item item, Map<String,String> parameters, StreamContext context) {
         return new BaseItemCommandResult();
     }
 
     /**
      * Perform logic after executing the command on each item.
+     * @param context The contextual data for the Item stream.
      * @return An ExecutionResult detailing the results of the complete execution.
      */
-    protected ExecutionResult complete() {
+    protected ExecutionResult complete(StreamContext context) {
         //override to include complete logic
         return new DefaultExecutionResult();
     }

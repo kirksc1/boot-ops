@@ -8,7 +8,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
 class ItemStreamCommandServiceTest {
@@ -102,7 +102,7 @@ class ItemStreamCommandServiceTest {
         Stream<URI> uriStream = Arrays.stream(new URI[]{uri});
         when(streamFactory.buildStream()).thenReturn(uriStream);
         when(command1.getName()).thenReturn("test");
-        when(command1.execute(uriStream, commandParams)).thenReturn(commandResult);
+        when(command1.execute(same(uriStream), same(commandParams), any(StreamContext.class))).thenReturn(commandResult);
 
         commandList.add(command1);
         ItemStreamCommandService service = new ItemStreamCommandService(commandList);
@@ -111,7 +111,7 @@ class ItemStreamCommandServiceTest {
 
         assertSame(commandResult, result);
 
-        verify(command1, times(1)).execute(same(uriStream), same(commandParams));
+        verify(command1, times(1)).execute(same(uriStream), same(commandParams), any(StreamContext.class));
     }
 
 }
