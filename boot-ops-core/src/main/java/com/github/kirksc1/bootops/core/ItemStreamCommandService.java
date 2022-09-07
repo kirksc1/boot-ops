@@ -46,6 +46,6 @@ public class ItemStreamCommandService {
         Stream<URI> uriStream = Optional.ofNullable(streamFactory.buildStream())
                 .orElseThrow(() -> new BootOpsException("ItemManifestStreamFactory produced a null stream"));
 
-        return command.execute(uriStream,commandParams);
+        return command.execute(uriStream, commandParams, new DefaultStreamContext());
     }
 }
