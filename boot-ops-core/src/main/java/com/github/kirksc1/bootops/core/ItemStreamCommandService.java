@@ -2,6 +2,7 @@ package com.github.kirksc1.bootops.core;
 
 import org.springframework.util.Assert;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -43,8 +44,13 @@ public class ItemStreamCommandService {
         ItemStreamCommand command = Optional.ofNullable(streamCommands.get(commandName))
                 .orElseThrow(() -> new BootOpsException("Command named '" + commandName +"' was not recognized"));
 
-        Stream<URI> uriStream = Optional.ofNullable(streamFactory.buildStream())
-                .orElseThrow(() -> new BootOpsException("ItemManifestStreamFactory produced a null stream"));
+        Stream<URI> uriStream = null;
+        try {
+            uriStream = Optional.ofNullable(streamFactory.buildStream())
+                    .orElseThrow(() -> new BootOpsException("ItemManifestStreamFactory produced a null stream"));
+        } catch (IOException e) {
+            throw new BootOpsException("Unable to build Stream<URI>", e);
+        }
 
         return command.execute(uriStream, commandParams, new DefaultStreamContext());
     }

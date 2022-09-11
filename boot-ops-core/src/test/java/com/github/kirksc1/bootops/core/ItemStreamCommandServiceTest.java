@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
@@ -82,7 +83,7 @@ class ItemStreamCommandServiceTest {
     }
 
     @Test
-    public void testExecute_whenItemManifestStreamFactoryReturnsNullStream_thenThrowBootOpsException() {
+    public void testExecute_whenItemManifestStreamFactoryReturnsNullStream_thenThrowBootOpsException() throws IOException {
         when(streamFactory.buildStream()).thenReturn(null);
         when(command1.getName()).thenReturn("test");
 
@@ -97,7 +98,7 @@ class ItemStreamCommandServiceTest {
     }
 
     @Test
-    public void testExecute_whenAllDataProvided_thenCommandExecutedAndResultReturned() {
+    public void testExecute_whenAllDataProvided_thenCommandExecutedAndResultReturned() throws IOException {
         URI uri = URI.create("test://test.com");
         Stream<URI> uriStream = Arrays.stream(new URI[]{uri});
         when(streamFactory.buildStream()).thenReturn(uriStream);
