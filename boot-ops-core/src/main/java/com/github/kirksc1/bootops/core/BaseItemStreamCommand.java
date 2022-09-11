@@ -6,9 +6,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,14 +96,14 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
     private ItemCommandResult executeUri(URI uri, Map<String,String> parameters, StreamContext context) {
         ItemCommandResult retVal = null;
         try {
-            OutputStream outputStream = reader.read(uri);
-            if (outputStream == null) {
+            InputStream inputStream = reader.read(uri);
+            if (inputStream == null) {
                 throw new IllegalStateException("ItemManifestReader.read(URI) returned a null value");
             }
 
-            Item item = parser.parse(outputStream);
+            Item item = parser.parse(inputStream);
             if (item == null) {
-                throw new IllegalStateException("ItemManifestParser.parse(OutputStream) returned a null value");
+                throw new IllegalStateException("ItemManifestParser.parse(InputStream) returned a null value");
             }
 
             if (this.filter.test(item)) {
