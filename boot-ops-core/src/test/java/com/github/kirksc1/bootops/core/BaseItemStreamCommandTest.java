@@ -7,9 +7,8 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -26,14 +25,14 @@ class BaseItemStreamCommandTest {
     private ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
     private StreamContext context = mock(StreamContext.class);
 
-    private OutputStream outputStream = mock(OutputStream.class);
+    private InputStream inputStream = mock(InputStream.class);
     private Item item = mock(Item.class);
     private final URI uri = URI.create("https://www.test.com");
 
     @BeforeEach
     public void beforeEach() {
         Mockito.reset(reader, parser, filter, publisher, context);
-        Mockito.reset(outputStream, item);
+        Mockito.reset(inputStream, item);
     }
 
     @Test
@@ -86,8 +85,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -95,7 +94,7 @@ class BaseItemStreamCommandTest {
 
         assertTrue(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(0)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -113,7 +112,7 @@ class BaseItemStreamCommandTest {
         Stream<URI> uriStream = Stream.of(uri);
 
         when(reader.read(same(uri))).thenThrow(new IOException("Forced Failure"));
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -121,7 +120,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(0)).parse(same(outputStream));
+        verify(parser, times(0)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -138,7 +137,7 @@ class BaseItemStreamCommandTest {
         Stream<URI> uriStream = Stream.of(uri);
 
         when(reader.read(same(uri))).thenThrow(new BootOpsException("Forced Failure"));
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -146,7 +145,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(0)).parse(same(outputStream));
+        verify(parser, times(0)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -163,7 +162,7 @@ class BaseItemStreamCommandTest {
         Stream<URI> uriStream = Stream.of(uri);
 
         when(reader.read(same(uri))).thenReturn(null);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -171,7 +170,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(0)).parse(same(outputStream));
+        verify(parser, times(0)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -187,8 +186,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenThrow(new ParseException("Forced Failure", 0));
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenThrow(new ParseException("Forced Failure"));
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -196,7 +195,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -212,8 +211,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenThrow(new BootOpsException("Forced Failure"));
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenThrow(new BootOpsException("Forced Failure"));
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -221,7 +220,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -237,8 +236,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(null);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(null);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -246,7 +245,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -262,8 +261,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         Predicate<Item> predicate = new Predicate<Item>() {
             @Override
@@ -278,7 +277,7 @@ class BaseItemStreamCommandTest {
 
         assertTrue(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(0)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -294,8 +293,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         Predicate<Item> predicate = new Predicate<Item>() {
             @Override
@@ -310,7 +309,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -326,8 +325,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.startBootOpsException = true;
@@ -336,7 +335,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(0)).read(same(uri));
-        verify(parser, times(0)).parse(same(outputStream));
+        verify(parser, times(0)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -352,8 +351,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.startRuntimeException = true;
@@ -362,7 +361,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(0)).read(same(uri));
-        verify(parser, times(0)).parse(same(outputStream));
+        verify(parser, times(0)).parse(same(inputStream));
         verify(publisher, times(0)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -378,8 +377,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.completeBootOpsException = true;
@@ -388,7 +387,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -405,8 +404,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
         command.completeRuntimeException = true;
@@ -415,7 +414,7 @@ class BaseItemStreamCommandTest {
 
         assertFalse(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(1)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -432,8 +431,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
@@ -444,7 +443,7 @@ class BaseItemStreamCommandTest {
 
         assertTrue(success);
         verify(reader, times(1)).read(same(uri));
-        verify(parser, times(1)).parse(same(outputStream));
+        verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(0)).publishEvent(any(BootOpsExceptionEvent.class));
 
@@ -472,8 +471,8 @@ class BaseItemStreamCommandTest {
         URI uri = URI.create("http://www.test.com");
         Stream<URI> uriStream = Stream.of(uri);
 
-        when(reader.read(same(uri))).thenReturn(outputStream);
-        when(parser.parse(same(outputStream))).thenReturn(item);
+        when(reader.read(same(uri))).thenReturn(inputStream);
+        when(parser.parse(same(inputStream))).thenReturn(item);
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 

@@ -1,3 +1,4 @@
 rootProject.name = 'boot-ops'
 include 'boot-ops-core'
+include 'boot-ops-jackson'
 
