@@ -1,4 +1,4 @@
-package com.github.kirksc1.bootops.core.jackson;
+package com.github.kirksc1.bootops.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
