@@ -1,0 +1,42 @@
+package com.github.kirksc1.bootops.core;
+
+import com.github.kirksc1.bootops.core.file.FileSystemItemManifestReader;
+import com.github.kirksc1.bootops.core.file.FileSystemItemManifestStreamFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * BootOpsCoreAutoConfiguration is the Spring Boot Auto Configuration class for the Boot Ops Core functionality.
+ */
+@Configuration
+public class BootOpsCoreAutoConfiguration {
+
+    /**
+     * The default ItemManifestReader bean.
+     */
+    @Bean
+    public ItemManifestReader itemManifestReader() {
+        return new FileSystemItemManifestReader();
+    }
+
+    /**
+     * The default ItemManifestStreamFactory bean.
+     */
+    @Bean
+    public ItemManifestStreamFactory itemManifestStreamFactory() {
+        return new FileSystemItemManifestStreamFactory(new File("build"));
+    }
+
+    /**
+     * The ItemStreamCommandService bean.
+     */
+    @Bean
+    public ItemStreamCommandService itemStreamCommandService(Optional<List<ItemStreamCommand>> optionalItemStreamCommands) {
+        return new ItemStreamCommandService(optionalItemStreamCommands.orElse(new ArrayList<>()));
+    }
+}

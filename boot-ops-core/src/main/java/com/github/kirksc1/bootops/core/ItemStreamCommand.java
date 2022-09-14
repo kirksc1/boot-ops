@@ -29,7 +29,7 @@ public abstract class ItemStreamCommand {
     /**
      * Execute the command on each of the items referenced by the provided URIs.
      * @param uriStream The stream of URIs referencing the items.
-     * @param parameters A collection of command configuraton parameters.
+     * @param parameters A collection of command configuration parameters.
      * @param context The contextual data for the Item stream.
      * @return ItemStreamCommandResult The result of command execution on the stream.
      */
