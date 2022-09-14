@@ -71,7 +71,22 @@ class BootOpsApplicationRunnerTest {
     }
 
     @Test
-    public void testRun_whenTwoCommandsProvided_thenCallServiceForEachCommandWithParameters() {
+    public void testRun_whenTwoCommandsProvided_thenCallServiceForEachCommandWithParameters() throws Exception {
+        BootOpsApplicationRunner runner = new BootOpsApplicationRunner(service, factory);
 
+        DefaultApplicationArguments args = new DefaultApplicationArguments("--command=test", "--command=test2", "--log=info");
+
+        runner.run(args);
+
+        ArgumentCaptor<Map<String,String>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(service, times(1)).execute(eq("test"), paramsCaptor.capture(), same(factory));
+        verify(service, times(1)).execute(eq("test2"), paramsCaptor.capture(), same(factory));
+
+        Map<String,String> params = paramsCaptor.getValue();
+
+        assertEquals(2, params.size());
+        assertEquals("test", params.get("command"));
+        assertEquals("info", params.get("log"));
     }
 }
