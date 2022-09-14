@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+}
+
+group 'com.github.kirksc1.bootops'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":boot-ops-core")
+
+    implementation("org.springframework.boot:spring-boot-starter:2.7.0")
+
+    compileOnly('org.projectlombok:lombok:1.18.22')
+    annotationProcessor('org.projectlombok:lombok:1.18.22')
+
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
+    testImplementation('org.springframework.boot:spring-boot-starter-test:2.7.0')
+
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+    testRuntimeOnly project(":boot-ops-jackson")
+}
+
+test {
+    useJUnitPlatform()
+}
