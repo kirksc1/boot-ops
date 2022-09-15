@@ -36,7 +36,7 @@ public class ItemStreamCommandService {
      * @param streamFactory The ItemManifestStreamFactory to provide the stream of Item manifests.
      * @return An ItemStreamCommandResult to describe the result of the execution.
      */
-    public ItemStreamCommandResult execute(String commandName, Map<String,String> commandParams, ItemManifestStreamFactory streamFactory) {
+    public ItemStreamCommandResult execute(String commandName, Map<String,List<String>> commandParams, ItemManifestStreamFactory streamFactory) {
         Assert.notNull(commandName, "The command name provided was null");
         Assert.notNull(commandParams, "The command parameters Map provided was null");
         Assert.notNull(streamFactory, "The ItemManifestStreamFactory provided was null");

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.DefaultApplicationArguments;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,15 +60,15 @@ class BootOpsApplicationRunnerTest {
 
         runner.run(args);
 
-        ArgumentCaptor<Map<String,String>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+        ArgumentCaptor<Map<String,List<String>>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
 
         verify(service, times(1)).execute(eq("test"), paramsCaptor.capture(), same(factory));
 
-        Map<String,String> params = paramsCaptor.getValue();
+        Map<String,List<String>> params = paramsCaptor.getValue();
 
         assertEquals(2, params.size());
-        assertEquals("test", params.get("command"));
-        assertEquals("info", params.get("log"));
+        assertEquals("test", params.get("command").get(0));
+        assertEquals("info", params.get("log").get(0));
     }
 
     @Test
@@ -78,15 +79,20 @@ class BootOpsApplicationRunnerTest {
 
         runner.run(args);
 
-        ArgumentCaptor<Map<String,String>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+        ArgumentCaptor<Map<String, List<String>>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
 
         verify(service, times(1)).execute(eq("test"), paramsCaptor.capture(), same(factory));
         verify(service, times(1)).execute(eq("test2"), paramsCaptor.capture(), same(factory));
 
-        Map<String,String> params = paramsCaptor.getValue();
+        Map<String,List<String>> params = paramsCaptor.getValue();
 
         assertEquals(2, params.size());
-        assertEquals("test", params.get("command"));
-        assertEquals("info", params.get("log"));
+
+        assertEquals(2, params.get("command").size());
+        assertEquals("test", params.get("command").get(0));
+        assertEquals("test2", params.get("command").get(1));
+
+        assertEquals(1, params.get("log").size());
+        assertEquals("info", params.get("log").get(0));
     }
 }

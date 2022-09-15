@@ -436,9 +436,9 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        Map<String,String> params = new HashMap<>();
-        params.put("1", "one");
-        params.put("2", "two");
+        Map<String,List<String>> params = new HashMap<>();
+        params.put("1", Arrays.asList("one"));
+        params.put("2", Arrays.asList("two"));
         boolean success = command.execute(uriStream, params, context).isSuccessful();
 
         assertTrue(success);
@@ -452,8 +452,8 @@ class BaseItemStreamCommandTest {
         assertSame(item, items.get(0));
 
         assertEquals(2, command.parameters.size());
-        assertEquals("one", command.parameters.get("1"));
-        assertEquals("two", command.parameters.get("2"));
+        assertEquals("one", command.parameters.get("1").get(0));
+        assertEquals("two", command.parameters.get("2").get(0));
 
         assertTrue(command.startCalled);
         assertTrue(command.completeCalled);
@@ -476,7 +476,7 @@ class BaseItemStreamCommandTest {
 
         TestCommand command = new TestCommand("test", reader, parser, null, publisher);
 
-        Map<String,String> params = new HashMap<>();
+        Map<String,List<String>> params = new HashMap<>();
         boolean success = command.execute(uriStream, params, context).isSuccessful();
 
         assertTrue(success);
@@ -488,7 +488,7 @@ class BaseItemStreamCommandTest {
 
     static class TestCommand extends BaseItemStreamCommand {
         private List<Item> items = new ArrayList<>();
-        private HashMap<String,String> parameters = new HashMap<>();
+         private HashMap<String,List<String>> parameters = new HashMap<>();
         private boolean startCalled = false;
         private boolean completeCalled = false;
 
@@ -536,7 +536,7 @@ class BaseItemStreamCommandTest {
         }
 
         @Override
-        protected ItemCommandResult execute(Item item, Map<String,String> parameters, StreamContext context) {
+        protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, StreamContext context) {
             System.out.println("execute");
             items.add(item);
             this.parameters.putAll(parameters);

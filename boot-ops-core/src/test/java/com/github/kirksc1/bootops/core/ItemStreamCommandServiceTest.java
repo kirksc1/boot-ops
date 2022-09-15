@@ -18,7 +18,7 @@ class ItemStreamCommandServiceTest {
     private ItemManifestStreamFactory streamFactory = mock(ItemManifestStreamFactory.class);
     private ItemStreamCommandResult commandResult = mock(ItemStreamCommandResult.class);
 
-    private Map<String,String> commandParams = new HashMap<>();
+    private Map<String,List<String>> commandParams = new HashMap<>();
     private List<ItemStreamCommand> commandList = new ArrayList<>();
 
     @BeforeEach

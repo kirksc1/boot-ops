@@ -51,7 +51,7 @@ public class BootOpsApplicationRunner implements ApplicationRunner {
                 commandNames.forEach(s -> log.debug("Found commands {}", commandNames));
             }
 
-            Map<String,String> params = buildParameterMap(args);
+            Map<String,List<String>> params = buildParameterMap(args);
             if (log.isDebugEnabled()) {
                 params.keySet().forEach(s -> log.debug("Found parameter {}={}", s, params.get(s)));
             }
@@ -67,11 +67,11 @@ public class BootOpsApplicationRunner implements ApplicationRunner {
      * @param args The command line parameters from application initiation.
      * @return The constructed parameter Map.
      */
-    private Map<String, String> buildParameterMap(ApplicationArguments args) {
-        Map<String,String> retVal = new HashMap<>();
+    private Map<String, List<String>> buildParameterMap(ApplicationArguments args) {
+        Map<String,List<String>> retVal = new HashMap<>();
 
         for (String name : args.getOptionNames()) {
-            retVal.put(name, args.getOptionValues(name).get(0));
+            retVal.put(name, args.getOptionValues(name));
         }
 
         return retVal;

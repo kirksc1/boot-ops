@@ -68,7 +68,7 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * @return ItemStreamCommandResult The result of command execution on the stream.
      */
     @Override
-    ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,String> parameters, StreamContext context) {
+    ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,List<String>> parameters, StreamContext context) {
         ExecutionResult startResult = null;
         ExecutionResult completeResult = null;
 
@@ -93,7 +93,7 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * @param context The contextual data for the Item stream.
      * @return ItemCommandResult The result of command execution on the item.
      */
-    private ItemCommandResult executeUri(URI uri, Map<String,String> parameters, StreamContext context) {
+    private ItemCommandResult executeUri(URI uri, Map<String,List<String>> parameters, StreamContext context) {
         ItemCommandResult retVal = null;
         try {
             InputStream inputStream = reader.read(uri);
@@ -209,7 +209,7 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * @param context The contextual data for the Item stream.
      * @return An ExecutionResult detailing the results of the command execution on the item.
      */
-    protected ItemCommandResult execute(Item item, Map<String,String> parameters, StreamContext context) {
+    protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, StreamContext context) {
         return new BaseItemCommandResult();
     }
 
