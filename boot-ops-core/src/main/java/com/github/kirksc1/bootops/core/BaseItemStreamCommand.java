@@ -199,7 +199,9 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      */
     protected ExecutionResult start(StreamContext context) {
         //override to include start logic
-        return new DefaultExecutionResult();
+        DefaultExecutionResult retVal = new DefaultExecutionResult();
+        retVal.succeeded();
+        return retVal;
     }
 
     /**
@@ -220,7 +222,9 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      */
     protected ExecutionResult complete(StreamContext context) {
         //override to include complete logic
-        return new DefaultExecutionResult();
+        DefaultExecutionResult retVal = new DefaultExecutionResult();
+        retVal.succeeded();
+        return retVal;
     }
 
     @Getter

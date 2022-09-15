@@ -2,6 +2,7 @@ package com.github.kirksc1.bootops.core;
 
 import com.github.kirksc1.bootops.core.file.FileSystemItemManifestReader;
 import com.github.kirksc1.bootops.core.file.FileSystemItemManifestStreamFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,8 +29,8 @@ public class BootOpsCoreAutoConfiguration {
      * The default ItemManifestStreamFactory bean.
      */
     @Bean
-    public ItemManifestStreamFactory itemManifestStreamFactory() {
-        return new FileSystemItemManifestStreamFactory(new File("build"));
+    public ItemManifestStreamFactory itemManifestStreamFactory(@Value("${boot-ops.manifest-root-directory:manifests}") String itemRootDirectory) {
+        return new FileSystemItemManifestStreamFactory(new File(itemRootDirectory));
     }
 
     /**
