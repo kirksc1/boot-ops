@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.util.Assert;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -33,5 +34,5 @@ public abstract class ItemStreamCommand {
      * @param context The contextual data for the Item stream.
      * @return ItemStreamCommandResult The result of command execution on the stream.
      */
-    abstract ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,String> parameters, StreamContext context);
+    abstract ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String, List<String>> parameters, StreamContext context);
 }
