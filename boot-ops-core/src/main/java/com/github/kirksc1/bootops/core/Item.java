@@ -29,5 +29,5 @@ public class Item implements Serializable {
     /**
      * A Map of attribute configuration for the item.
      */
-    private final LinkedHashMap<String,Serializable> attributes = new LinkedHashMap<>();
+    private final LinkedHashMap<String,Object> attributes = new LinkedHashMap<>();
 }
