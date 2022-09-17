@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,15 @@ public class BootOpsIntegrationTest {
     public void testBootOps_whenSingleManifest_thenProcessOneItem() {
         assertEquals("my-item", command.item.getName());
 
+        TestAttribute attribute = (TestAttribute) command.item.getAttributes().get("test");
+        assertEquals("red", attribute.getColor());
+        assertEquals(2, attribute.getCount());
+        assertEquals(true, attribute.isActive());
+
+        assertEquals(2, attribute.getTypes().size());
+        assertEquals("type1", attribute.getTypes().get(0));
+        assertEquals("type2", attribute.getTypes().get(1));
+
         assertEquals(1, command.parameters.get("command").size());
         assertEquals("test", command.parameters.get("command").get(0));
     }
@@ -45,6 +55,11 @@ public class BootOpsIntegrationTest {
         @Bean
         public TestCommand testCommand(ItemManifestReader reader, ItemManifestParser parser, ApplicationEventPublisher publisher) {
             return new TestCommand(reader, parser, new ArrayList<>(), publisher);
+        }
+
+        @Bean
+        public AttributeType testAttributeType() {
+            return new AttributeType("test", TestAttribute.class);
         }
     }
 
@@ -62,6 +77,45 @@ public class BootOpsIntegrationTest {
             this.parameters = new HashMap<>(parameters);
 
             return super.execute(item, parameters, context);
+        }
+    }
+
+    static class TestAttribute implements Serializable {
+        private String color;
+        private int count;
+        private boolean active;
+        private List<String> types;
+
+        public String getColor() {
+            return color;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public void setActive(boolean active) {
+            this.active = active;
+        }
+
+        public List<String> getTypes() {
+            return types;
+        }
+
+        public void setTypes(List<String> types) {
+            this.types = types;
         }
     }
 
