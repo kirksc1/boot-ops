@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * The StreamContext is a named Object Map that can be used to store information across item processing.
  */
-public interface StreamContext {
+public interface ItemContext {
 
     /**
      * Put the Object into the context under the provided key.

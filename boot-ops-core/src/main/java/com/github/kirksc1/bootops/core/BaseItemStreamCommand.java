@@ -95,19 +95,21 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      */
     private ItemCommandResult executeUri(URI uri, Map<String,List<String>> parameters, StreamContext context) {
         ItemCommandResult retVal = null;
+        Item item = null;
+
         try {
             InputStream inputStream = reader.read(uri);
             if (inputStream == null) {
                 throw new IllegalStateException("ItemManifestReader.read(URI) returned a null value");
             }
 
-            Item item = parser.parse(inputStream);
+            item = parser.parse(inputStream);
             if (item == null) {
                 throw new IllegalStateException("ItemManifestParser.parse(InputStream) returned a null value");
             }
 
             if (this.filter.test(item)) {
-                retVal = execute(item, parameters, context);
+                retVal = execute(item, parameters, new DefaultItemContext());
                 publisher.publishEvent(new ItemCompletedEvent(this, item));
             } else {
                 BaseItemCommandResult result = new BaseItemCommandResult();
@@ -116,16 +118,16 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
             }
         } catch (IOException e) {
             retVal = buildItemFailureResult(e);
-            publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to read manifest data at URI=" + uri, e)));
+            publisher.publishEvent(new BootOpsExceptionEvent(this, item, new BootOpsException("Unable to read manifest data at URI=" + uri, e)));
         } catch (ParseException e) {
             retVal = buildItemFailureResult(e);
-            publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to parse the manifest data into an Item", e)));
+            publisher.publishEvent(new BootOpsExceptionEvent(this, item, new BootOpsException("Unable to parse the manifest data into an Item", e)));
         } catch (BootOpsException e) {
             retVal = buildItemFailureResult(e);
-            publisher.publishEvent(new BootOpsExceptionEvent(this, e));
+            publisher.publishEvent(new BootOpsExceptionEvent(this, item, e));
         } catch (RuntimeException e) {
             retVal = buildItemFailureResult(e);
-            publisher.publishEvent(new BootOpsExceptionEvent(this, new BootOpsException("Unable to process the Item at URI=" + uri, e)));
+            publisher.publishEvent(new BootOpsExceptionEvent(this, item,new BootOpsException("Unable to process the Item at URI=" + uri, e)));
         }
         return retVal;
     }
@@ -208,10 +210,10 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * Perform command logic on each item.
      * @param item The item on which to perform the command.
      * @param parameters The parameters for use by the command when executing on the item.
-     * @param context The contextual data for the Item stream.
-     * @return An ExecutionResult detailing the results of the command execution on the item.
+     * @param context The contextual data for the Item.
+     * @return An ItemCommandResult detailing the results of the command execution on the item.
      */
-    protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, StreamContext context) {
+    protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, ItemContext context) {
         return new BaseItemCommandResult();
     }
 

@@ -1,6 +1,7 @@
 package com.github.kirksc1.bootops.core;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.util.Assert;
 
@@ -8,6 +9,7 @@ import org.springframework.util.Assert;
  * A Spring application event that will be published when a BootOpsException occurs.
  */
 @Getter
+@ToString(callSuper=true, includeFieldNames=true)
 public class BootOpsExceptionEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 29587983742594526L;

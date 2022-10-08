@@ -1,6 +1,7 @@
 package com.github.kirksc1.bootops.cli;
 
 import com.github.kirksc1.bootops.core.BootOpsCoreAutoConfiguration;
+import com.github.kirksc1.bootops.jackson.BootOpsJacksonAutoConfiguration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -15,6 +16,7 @@ class BootOpsCliAutoConfigurationTest {
     public void testConfiguration_whenConfigured_thenAllBeansAddedToContext() {
         this.contextRunner
                 .withUserConfiguration(BootOpsCoreAutoConfiguration.class)
+                .withUserConfiguration(BootOpsJacksonAutoConfiguration.class)
                 .run((context) -> {
             Assertions.assertThat(context).hasSingleBean(BootOpsApplicationRunner.class);
         });
