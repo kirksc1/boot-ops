@@ -1,5 +1,6 @@
 package com.github.kirksc1.bootops.core;
 
+import com.github.kirksc1.bootops.core.log.LoggingEventListener;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -17,6 +18,23 @@ class BootOpsCoreAutoConfigurationTest {
             Assertions.assertThat(context).hasSingleBean(ItemManifestStreamFactory.class);
             Assertions.assertThat(context).hasSingleBean(ItemStreamCommandService.class);
         });
+    }
+
+    @Test
+    public void testConfiguration_whenLoggingEnabled_thenAllLogBeansAddedToContext() {
+        this.contextRunner
+                .withPropertyValues("boot-ops.event.logging.enabled=true")
+                .run((context) -> {
+            Assertions.assertThat(context).hasSingleBean(LoggingEventListener.class);
+        });
+    }
+
+    @Test
+    public void testConfiguration_whenLoggingNotConfigured_thenNoLogBeansAddedToContext() {
+        this.contextRunner
+                .run((context) -> {
+                    Assertions.assertThat(context).doesNotHaveBean(LoggingEventListener.class);
+                });
     }
 
 }

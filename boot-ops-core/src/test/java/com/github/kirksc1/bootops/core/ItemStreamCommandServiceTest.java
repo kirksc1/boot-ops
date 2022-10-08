@@ -98,6 +98,21 @@ class ItemStreamCommandServiceTest {
     }
 
     @Test
+    public void testExecute_whenItemManifestStreamFactoryThrowsIOException_thenThrowBootOpsException() throws IOException {
+        when(streamFactory.buildStream()).thenThrow(new IOException("Forced Failure"));
+        when(command1.getName()).thenReturn("test");
+
+        commandList.add(command1);
+        ItemStreamCommandService service = new ItemStreamCommandService(commandList);
+
+        BootOpsException thrown = Assertions.assertThrows(BootOpsException.class, () -> {
+            service.execute("test", commandParams, streamFactory);
+        });
+
+        Assertions.assertEquals("Unable to build Stream<URI>", thrown.getMessage());
+    }
+
+    @Test
     public void testExecute_whenAllDataProvided_thenCommandExecutedAndResultReturned() throws IOException {
         URI uri = URI.create("test://test.com");
         Stream<URI> uriStream = Arrays.stream(new URI[]{uri});

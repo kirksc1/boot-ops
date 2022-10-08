@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The DefaultStreamContext is the default implementation of a StreamContext.  It stores its contextual
+ * The DefaultItemContext is the default implementation of a ItemContext.  It stores its contextual
  * data within an in-memory Map.
  */
-public class DefaultStreamContext implements StreamContext {
+public class DefaultItemContext implements ItemContext {
     private final Map<String,Object> contextMap = new HashMap<>();
 
     /**

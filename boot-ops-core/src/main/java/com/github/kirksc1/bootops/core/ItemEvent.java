@@ -1,6 +1,7 @@
 package com.github.kirksc1.bootops.core;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.util.Assert;
 
@@ -8,6 +9,7 @@ import org.springframework.util.Assert;
  * A Spring application event that references an Item or is associated with an Item.
  */
 @Getter
+@ToString(callSuper=true, includeFieldNames=true)
 public abstract class ItemEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 234957983476L;

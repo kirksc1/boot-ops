@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DefaultStreamContextTest {
+class DefaultItemContextTest {
 
     @Test
     public void testPut_whenKeyNull_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new DefaultStreamContext().put(null, "val");
+            new DefaultItemContext().put(null, "val");
         });
 
         Assertions.assertEquals("The key provided was null", thrown.getMessage());
@@ -18,7 +18,7 @@ class DefaultStreamContextTest {
 
     @Test
     public void testPut_whenKeyObjectAdded_thenObjectGettable() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
         context.put("key", "value");
 
         assertSame("value", context.get("key"));
@@ -27,7 +27,7 @@ class DefaultStreamContextTest {
     @Test
     public void testRemove_whenKeyNull_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new DefaultStreamContext().remove(null);
+            new DefaultItemContext().remove(null);
         });
 
         Assertions.assertEquals("The key provided was null", thrown.getMessage());
@@ -35,7 +35,7 @@ class DefaultStreamContextTest {
 
     @Test
     public void testRemove_whenKeyPresent_thenReturnObject() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
         context.put("key", "value");
 
         assertSame("value", context.remove("key"));
@@ -43,7 +43,7 @@ class DefaultStreamContextTest {
 
     @Test
     public void testRemove_whenKeyNotPresent_thenReturnNull() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
 
         assertNull(context.remove("key"));
     }
@@ -51,7 +51,7 @@ class DefaultStreamContextTest {
     @Test
     public void testRemove_whenKeyRemoved_thenObjectNotGettable() {
         String key = "key";
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
         context.put(key, "value");
 
         context.remove(key);
@@ -62,7 +62,7 @@ class DefaultStreamContextTest {
     @Test
     public void testGet_whenKeyNull_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new DefaultStreamContext().get(null);
+            new DefaultItemContext().get(null);
         });
 
         Assertions.assertEquals("The key provided was null", thrown.getMessage());
@@ -70,7 +70,7 @@ class DefaultStreamContextTest {
 
     @Test
     public void testGet_whenKeyPresent_thenReturnObject() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
         context.put("key", "value");
 
         assertSame("value", context.get("key"));
@@ -78,21 +78,21 @@ class DefaultStreamContextTest {
 
     @Test
     public void testGet_whenKeyNotPresent_thenReturnNull() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
 
         assertNull(context.get("key"));
     }
 
     @Test
     public void testkeySet_whenNoObjects_thenReturnEmptySet() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
 
         assertTrue(context.keySet().isEmpty());
     }
 
     @Test
     public void testKeySet_whenKeyObjectAdded_thenKeySetContainsKey() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
         context.put("key", "value");
 
         assertEquals(1, context.keySet().size());
@@ -101,7 +101,7 @@ class DefaultStreamContextTest {
 
     @Test
     public void testContainsKey_whenKeyPresent_thenReturnTrue() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
         context.put("key", "value");
 
         assertTrue(context.containsKey("key"));
@@ -109,7 +109,7 @@ class DefaultStreamContextTest {
 
     @Test
     public void testContainsKey_whenKeyAbsent_thenReturnFalse() {
-        DefaultStreamContext context = new DefaultStreamContext();
+        DefaultItemContext context = new DefaultItemContext();
 
         assertFalse(context.containsKey("key"));
     }

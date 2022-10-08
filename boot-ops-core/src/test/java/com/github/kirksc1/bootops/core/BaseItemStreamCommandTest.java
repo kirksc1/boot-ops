@@ -482,7 +482,7 @@ class BaseItemStreamCommandTest {
         assertTrue(success);
 
         assertSame(context, command.startContext);
-        assertSame(context, command.itemContext);
+        assertTrue(command.itemContext instanceof ItemContext);
         assertSame(context, command.completeContext);
     }
 
@@ -498,7 +498,7 @@ class BaseItemStreamCommandTest {
         private boolean completeRuntimeException=false;
 
         private StreamContext startContext = null;
-        private StreamContext itemContext = null;
+        private ItemContext itemContext = null;
         private StreamContext completeContext = null;
 
         public TestCommand(String name, ItemManifestReader reader, ItemManifestParser parser, List<Predicate<Item>> filters, ApplicationEventPublisher publisher) {
@@ -536,7 +536,7 @@ class BaseItemStreamCommandTest {
         }
 
         @Override
-        protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, StreamContext context) {
+        protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, ItemContext context) {
             System.out.println("execute");
             items.add(item);
             this.parameters.putAll(parameters);

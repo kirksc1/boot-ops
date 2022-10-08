@@ -72,7 +72,7 @@ public class BootOpsIntegrationTest {
         }
 
         @Override
-        protected ItemCommandResult execute(Item item, Map<String, List<String>> parameters, StreamContext context) {
+        protected ItemCommandResult execute(Item item, Map<String, List<String>> parameters, ItemContext context) {
             this.item = item;
             this.parameters = new HashMap<>(parameters);
 

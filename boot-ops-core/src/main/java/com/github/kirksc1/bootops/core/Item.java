@@ -2,6 +2,7 @@ package com.github.kirksc1.bootops.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -12,6 +13,7 @@ import java.util.LinkedHashMap;
  */
 @Getter
 @Setter
+@ToString(callSuper=true, includeFieldNames=true)
 public class Item implements Serializable {
 
     private static final long serialVersionUID = 1295728345628572L;
