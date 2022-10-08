@@ -2,6 +2,7 @@ package com.github.kirksc1.bootops.core;
 
 import com.github.kirksc1.bootops.core.file.FileSystemItemManifestReader;
 import com.github.kirksc1.bootops.core.file.FileSystemItemManifestStreamFactory;
+import com.github.kirksc1.bootops.core.init.InitConfiguration;
 import com.github.kirksc1.bootops.core.log.LogConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * BootOpsCoreAutoConfiguration is the Spring Boot Auto Configuration class for the Boot Ops Core functionality.
  */
 @Configuration
-@Import({LogConfiguration.class})
+@Import({InitConfiguration.class, LogConfiguration.class})
 public class BootOpsCoreAutoConfiguration {
 
     /**

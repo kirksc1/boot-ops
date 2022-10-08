@@ -1,5 +1,6 @@
 package com.github.kirksc1.bootops.core;
 
+import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
 import com.github.kirksc1.bootops.core.log.LoggingEventListener;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,13 @@ class BootOpsCoreAutoConfigurationTest {
                 .run((context) -> {
                     Assertions.assertThat(context).doesNotHaveBean(LoggingEventListener.class);
                 });
+    }
+
+    @Test
+    public void testConfiguration_whenConfigured_thenAllInitBeansAddedToContext() {
+        this.contextRunner.run((context) -> {
+            Assertions.assertThat(context).hasSingleBean(ItemInitializationExecutor.class);
+        });
     }
 
 }
