@@ -11,7 +11,9 @@ and easily expanded or adapted to individual needs.
 | Name | Description |
 |---|---|
 | [converge][converge] | Apply the Item and associated data to infrastructure |
+| [validate][validate] | Validate the Item and associated data for structure and policy validations |
 
 [gitops]: https://about.gitlab.com/topics/gitops/
 [springboot]: https://spring.io/projects/spring-boot/
 [converge]: docs/CONVERGE.md
+[validate]: docs/VALIDATE.md

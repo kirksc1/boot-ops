@@ -27,6 +27,8 @@ public class ItemInitializationExecutor {
      * @param item The item to initialize.
      */
     public void initiateInitialization(Item item) {
+        Assert.notNull(item, "The Item provided was null");
+
         eventPublisher.publishEvent(new ItemInitializationInitiatedEvent(this, item));
     }
 
@@ -35,6 +37,8 @@ public class ItemInitializationExecutor {
      * @param item The item that was initialized.
      */
     public void completeInitialization(Item item) {
+        Assert.notNull(item, "The Item provided was null");
+        
         eventPublisher.publishEvent(new ItemInitializationCompletedEvent(this, item));
     }
 }
