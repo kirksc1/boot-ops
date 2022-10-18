@@ -68,7 +68,7 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * @return ItemStreamCommandResult The result of command execution on the stream.
      */
     @Override
-    ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,List<String>> parameters, StreamContext context) {
+    public ItemStreamCommandResult execute(Stream<URI> uriStream, Map<String,List<String>> parameters, StreamContext context) {
         ExecutionResult startResult = null;
         ExecutionResult completeResult = null;
 
@@ -214,7 +214,9 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
      * @return An ItemCommandResult detailing the results of the command execution on the item.
      */
     protected ItemCommandResult execute(Item item, Map<String,List<String>> parameters, ItemContext context) {
-        return new BaseItemCommandResult();
+        BaseItemCommandResult retVal = new BaseItemCommandResult();
+        retVal.setSuccessful(true);
+        return retVal;
     }
 
     /**
