@@ -233,7 +233,8 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
 
     @Getter
     @Setter
-    static class BaseItemCommandResult implements ItemCommandResult {
+    public static class BaseItemCommandResult implements ItemCommandResult {
+        //TODO move to separate Default class
         private boolean successful = false;
         private Throwable failureCause = null;
         private Item item = null;
