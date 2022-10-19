@@ -1,5 +1,6 @@
 rootProject.name = 'boot-ops'
 include 'boot-ops-cli'
+include 'boot-ops-converge'
 include 'boot-ops-core'
 include 'boot-ops-jackson'
 include 'boot-ops-validate'

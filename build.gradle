@@ -16,6 +16,7 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test:2.7.0')
     testImplementation project(':boot-ops-cli')
+    testImplementation project(':boot-ops-converge')
     testImplementation project(':boot-ops-core')
     testImplementation project(':boot-ops-jackson')
 }

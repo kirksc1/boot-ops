@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
  */
 public class ItemValidationExecutor {
 
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Construct a new ItemValidationExecutor with the provided details.
@@ -25,6 +25,7 @@ public class ItemValidationExecutor {
     /**
      * Initiate the Item validation process for the provided Item.
      * @param item The item to validate.
+     * @return The created ItemValidationResult to hold the results of validation.
      */
     public ItemValidationResult initiateValidation(Item item) {
         Assert.notNull(item, "The Item provided was null");
