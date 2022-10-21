@@ -97,6 +97,7 @@ class BaseItemStreamCommandTest {
         verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(0)).publishEvent(any(BootOpsExceptionEvent.class));
+        verify(item, times(1)).setUri(same(uri));
 
         List<Item> items = command.getItems();
         assertEquals(1, items.size());
