@@ -109,6 +109,7 @@ public abstract class BaseItemStreamCommand extends ItemStreamCommand {
             }
 
             if (this.filter.test(item)) {
+                item.setUri(uri);
                 retVal = execute(item, parameters, new DefaultItemContext());
                 publisher.publishEvent(new ItemCompletedEvent(this, item));
             } else {
