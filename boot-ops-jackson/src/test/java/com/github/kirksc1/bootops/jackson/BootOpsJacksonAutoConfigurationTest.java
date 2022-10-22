@@ -15,6 +15,8 @@ class BootOpsJacksonAutoConfigurationTest {
     public void testConfiguration_whenConfigured_thenAllBeansAddedToContext() {
         this.contextRunner.run((context) -> {
             Assertions.assertThat(context).hasSingleBean(YAMLFactory.class);
+            Assertions.assertThat(context).hasSingleBean(ItemDeserializer.class);
+            Assertions.assertThat(context).hasSingleBean(ItemSerializer.class);
             Assertions.assertThat(context).hasSingleBean(ObjectMapper.class);
             Assertions.assertThat(context).hasSingleBean(JacksonItemManifestParser.class);
         });

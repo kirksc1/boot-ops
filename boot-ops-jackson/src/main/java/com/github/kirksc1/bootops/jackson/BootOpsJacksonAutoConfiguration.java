@@ -27,14 +27,31 @@ public class BootOpsJacksonAutoConfiguration {
     }
 
     /**
+     * Default ItemSerializer bean.
+     */
+    @Bean
+    public ItemSerializer itemSerializer() {
+        return new ItemSerializer();
+    }
+
+    /**
+     * Default ItemDeserializer bean.
+     */
+    @Bean
+    public ItemDeserializer itemDeserializer(Optional<List<AttributeType>> optAttributeTypes) {
+        return new ItemDeserializer(optAttributeTypes.orElse(new ArrayList<>()));
+    }
+
+    /**
      * Default ObjectMapper bean.
      */
     @Bean
-    public ObjectMapper objectMapper(YAMLFactory yamlFactory, Optional<List<AttributeType>> optAttributeTypes) {
+    public ObjectMapper objectMapper(YAMLFactory yamlFactory, ItemSerializer itemSerializer, ItemDeserializer itemDeserializer) {
         ObjectMapper retVal = new ObjectMapper(yamlFactory);
 
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(Item.class, new ItemDeserializer(optAttributeTypes.orElse(new ArrayList<>())));
+        module.addDeserializer(Item.class, itemDeserializer);
+        module.addSerializer(itemSerializer);
         retVal.registerModule(module);
 
         return retVal;

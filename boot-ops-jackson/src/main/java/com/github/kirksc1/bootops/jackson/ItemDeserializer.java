@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * ItemDeserializer is an implementation of the Jackson Deserializer that parses data into and Item instance.
+ * ItemDeserializer is an implementation of the Jackson Deserializer that parses data into an Item instance.
  */
 @Slf4j
 public class ItemDeserializer extends StdDeserializer<Item> {
