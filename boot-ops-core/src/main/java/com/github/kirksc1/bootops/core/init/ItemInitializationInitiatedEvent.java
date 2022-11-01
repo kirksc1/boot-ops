@@ -26,6 +26,8 @@ import lombok.ToString;
 @ToString(callSuper=true, includeFieldNames=true)
 public class ItemInitializationInitiatedEvent extends ItemEvent {
 
+    private static final long serialVersionUID = 7925067246260L;
+
     /**
      * Construct a new ItemInitializationInitiatedEvent with the provided details.
      * @param source The source that created the event.
