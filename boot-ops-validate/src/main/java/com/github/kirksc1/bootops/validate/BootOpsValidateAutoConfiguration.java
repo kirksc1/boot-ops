@@ -19,6 +19,7 @@ import com.github.kirksc1.bootops.core.Item;
 import com.github.kirksc1.bootops.core.ItemManifestParser;
 import com.github.kirksc1.bootops.core.ItemManifestReader;
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
+import com.github.kirksc1.bootops.core.system.SystemExecutor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 
@@ -42,8 +43,8 @@ public class BootOpsValidateAutoConfiguration {
      * Command to orchestrate the validation process.
      */
     @Bean
-    public ValidateItemStreamCommand validateItemStreamCommand(ItemManifestReader reader, ItemManifestParser parser, List<Predicate<Item>> filters, ApplicationEventPublisher publisher, ItemInitializationExecutor initializationExecutor, ItemValidationExecutor validationExecutor) {
-        return new ValidateItemStreamCommand(reader, parser, filters, publisher, initializationExecutor,validationExecutor);
+    public ValidateItemStreamCommand validateItemStreamCommand(ItemManifestReader reader, ItemManifestParser parser, List<Predicate<Item>> filters, ApplicationEventPublisher publisher, SystemExecutor systemExecutor, ItemInitializationExecutor initializationExecutor, ItemValidationExecutor validationExecutor) {
+        return new ValidateItemStreamCommand(reader, parser, filters, publisher, systemExecutor, initializationExecutor,validationExecutor);
     }
 
 }

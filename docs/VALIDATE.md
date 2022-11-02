@@ -9,11 +9,11 @@ concrete applications of the
 ## Events
 | Event | Description | Typical Usage | Status |
 |---|---|---|---|
-| SystemInitiatedEvent | Occurs on initial start of the process | Validate the infrastructure is ready to be updated | Pending |
+| SystemInitiatedEvent | Occurs on initial start of the process | Validate the infrastructure is ready to be updated | Supported |
 | ItemInitializationInitiatedEvent | Deserialization of manifest into an Item is complete | Population of defaults or other opinions | Supported |
 | ItemInitializationCompletedEvent | Item and associated data is fully populated | Validation of Item data for structure and policy | Supported |
 | ItemValidationInitiatedEvent | Item and associated data has been validated | Validation error processing, tracking of failure metrics and diagnostics | Supported |
 | ItemValidationCompletedEvent | Item processing has completed | Tracking of metrics related to Items | Supported |
-| SystemCompletedEvent | Occurs at the completion of all Item processing | Tracking of metrics related to the entire process | Pending |
+| SystemCompletedEvent | Occurs at the completion of all Item processing | Tracking of metrics related to the entire process | Supported |
 
 [application-listener]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/ApplicationListener.html

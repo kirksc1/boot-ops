@@ -29,6 +29,8 @@ import org.springframework.util.Assert;
 @Getter
 public class ItemValidationCompletedEvent extends ItemEvent {
 
+    private static final long serialVersionUID = 245726026929078305L;
+
     private final ItemValidationResult result;
 
     /**

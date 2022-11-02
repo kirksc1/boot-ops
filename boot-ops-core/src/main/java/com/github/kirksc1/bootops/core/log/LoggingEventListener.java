@@ -16,6 +16,7 @@
 package com.github.kirksc1.bootops.core.log;
 
 import com.github.kirksc1.bootops.core.ItemEvent;
+import com.github.kirksc1.bootops.core.SystemEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 
@@ -31,6 +32,15 @@ public class LoggingEventListener {
      */
     @EventListener
     public void onItemEvent(ItemEvent event) {
+        log.debug("{}", event);
+    }
+
+    /**
+     * Log the details of the ItemEvent provided.
+     * @param event The ItemEvent that was published.
+     */
+    @EventListener
+    public void onSystemEvent(SystemEvent event) {
         log.debug("{}", event);
     }
 }

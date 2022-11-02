@@ -17,6 +17,7 @@ package com.github.kirksc1.bootops.validate;
 
 import com.github.kirksc1.bootops.core.*;
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
+import com.github.kirksc1.bootops.core.system.SystemExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ class ValidateItemStreamCommandTest {
     private Predicate<Item> filter = mock(Predicate.class);
     private ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
     private StreamContext context = mock(StreamContext.class);
+    private SystemExecutor systemExecutor = mock(SystemExecutor.class);
     private ItemInitializationExecutor initializationExecutor = mock(ItemInitializationExecutor.class);
     private ItemValidationExecutor validationExecutor = mock(ItemValidationExecutor.class);
 
@@ -51,14 +53,14 @@ class ValidateItemStreamCommandTest {
     @BeforeEach
     public void beforeEach() {
         reset(reader, parser, filter, publisher, context);
-        reset(initializationExecutor, validationExecutor);
+        reset(systemExecutor, initializationExecutor, validationExecutor);
         reset(inputStream, item);
     }
 
     @Test
     public void testConstructor_whenNullReader_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ValidateItemStreamCommand(null, parser, null, publisher, initializationExecutor, validationExecutor);
+            new ValidateItemStreamCommand(null, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
         });
 
         Assertions.assertEquals("The ItemManifestReader provided was null", thrown.getMessage());
@@ -67,7 +69,7 @@ class ValidateItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullParser_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ValidateItemStreamCommand(reader, null, null, publisher, initializationExecutor, validationExecutor);
+            new ValidateItemStreamCommand(reader, null, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
         });
 
         Assertions.assertEquals("The ItemManifestParser provided was null", thrown.getMessage());
@@ -76,16 +78,25 @@ class ValidateItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullPublisher_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ValidateItemStreamCommand(reader, parser, null, null, initializationExecutor, validationExecutor);
+            new ValidateItemStreamCommand(reader, parser, null, null, systemExecutor, initializationExecutor, validationExecutor);
         });
 
         Assertions.assertEquals("The ApplicationEventPublisher provided was null", thrown.getMessage());
     }
 
     @Test
+    public void testConstructor_whenNullSystemExecutor_thenThrowIllegalArgumentException() {
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new ValidateItemStreamCommand(reader, parser, null, publisher, null, initializationExecutor, validationExecutor);
+        });
+
+        Assertions.assertEquals("The SystemExecutor provided was null", thrown.getMessage());
+    }
+
+    @Test
     public void testConstructor_whenNullItemInitializationExecutor_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ValidateItemStreamCommand(reader, parser, null, publisher, null, validationExecutor);
+            new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, null, validationExecutor);
         });
 
         Assertions.assertEquals("The ItemInitializationExecutor provided was null", thrown.getMessage());
@@ -94,7 +105,7 @@ class ValidateItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullItemValidationExecutor_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ValidateItemStreamCommand(reader, parser, null, publisher, initializationExecutor, null);
+            new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, null);
         });
 
         Assertions.assertEquals("The ItemValidationExecutor provided was null", thrown.getMessage());
@@ -109,7 +120,7 @@ class ValidateItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         when(validationExecutor.initiateValidation(same(item))).thenReturn(mock(ItemValidationResult.class));
 
-        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor);
+        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
@@ -120,6 +131,9 @@ class ValidateItemStreamCommandTest {
         verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(0)).publishEvent(any(BootOpsExceptionEvent.class));
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -137,13 +151,16 @@ class ValidateItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(initializationExecutor).initiateInitialization(same(item));
 
-        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor);
+        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(0)).completeInitialization(same(item));
@@ -161,13 +178,16 @@ class ValidateItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(initializationExecutor).completeInitialization(same(item));
 
-        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor);
+        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -185,13 +205,16 @@ class ValidateItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(validationExecutor).initiateValidation(same(item));
 
-        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor);
+        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -209,13 +232,16 @@ class ValidateItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(validationExecutor).completeValidation(same(item), any());
 
-        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor);
+        ValidateItemStreamCommand command = new ValidateItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));

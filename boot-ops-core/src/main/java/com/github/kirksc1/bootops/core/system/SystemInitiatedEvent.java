@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kirksc1.bootops.core.init;
+package com.github.kirksc1.bootops.core.system;
 
-import com.github.kirksc1.bootops.core.Item;
-import com.github.kirksc1.bootops.core.ItemEvent;
+import com.github.kirksc1.bootops.core.SystemEvent;
 import lombok.ToString;
 
 /**
- * A Spring application event that is published when an Item's initialization process
- * is starting.
+ * A Spring application event that is published when the system work has been initiated.
  */
 @ToString(callSuper=true, includeFieldNames=true)
-public class ItemInitializationInitiatedEvent extends ItemEvent {
+public class SystemInitiatedEvent extends SystemEvent {
 
-    private static final long serialVersionUID = 7925067246260L;
+    private static final long serialVersionUID = 52345346547L;
 
     /**
-     * Construct a new ItemInitializationInitiatedEvent with the provided details.
+     * Construct a new instance with the provided details.
      * @param source The source that created the event.
-     * @param item The Item whose execution was completed.
      */
-    public ItemInitializationInitiatedEvent(Object source, Item item) {
-        super(source, item);
+    public SystemInitiatedEvent(Object source) {
+        super(source);
     }
 }
