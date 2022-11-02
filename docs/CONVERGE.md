@@ -9,7 +9,7 @@ concrete applications of the
 ## Events
 | Event | Description | Typical Usage | Status |
 |---|---|---|---|
-| SystemInitiatedEvent | Occurs on initial start of the process | Validate the infrastructure is ready to be updated | Pending |
+| SystemInitiatedEvent | Occurs on initial start of the process | Validate the infrastructure is ready to be updated | Supported |
 | ItemInitializationInitiatedEvent | Deserialization of manifest into an Item is complete | Population of defaults or other opinions | Supported |
 | ItemInitializationCompletedEvent | Item and associated data is fully populated | TBD | Supported |
 | ItemValidationInitiatedEvent | Item and associated data is ready for validation | Validation of Item data for structure and policy | Supported |
@@ -17,6 +17,6 @@ concrete applications of the
 | ItemConvergeInitiatedEvent | Item and associated data is ready to be converged | Apply Item and associated data to infrastructure | Supported |
 | ItemConvergeCompletedEvent | Item and associated data has been converged | Tracking of converge or change metrics | Supported |
 | ItemCompletedEvent | Item processing has completed | Tracking of metrics related to Items | Supported |
-| SystemCompletedEvent | Occurs at the completion of all Item processing | Tracking of metrics related to the entire process | Pending |
+| SystemCompletedEvent | Occurs at the completion of all Item processing | Tracking of metrics related to the entire process | Supported |
 
 [application-listener]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/ApplicationListener.html

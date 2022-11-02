@@ -17,6 +17,7 @@ package com.github.kirksc1.bootops.core;
 
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
 import com.github.kirksc1.bootops.core.log.LoggingEventListener;
+import com.github.kirksc1.bootops.core.system.SystemExecutor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -57,6 +58,13 @@ class BootOpsCoreAutoConfigurationTest {
     public void testConfiguration_whenConfigured_thenAllInitBeansAddedToContext() {
         this.contextRunner.run((context) -> {
             Assertions.assertThat(context).hasSingleBean(ItemInitializationExecutor.class);
+        });
+    }
+
+    @Test
+    public void testConfiguration_whenConfigured_thenAllSystemBeansAddedToContext() {
+        this.contextRunner.run((context) -> {
+            Assertions.assertThat(context).hasSingleBean(SystemExecutor.class);
         });
     }
 

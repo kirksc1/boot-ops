@@ -17,6 +17,7 @@ package com.github.kirksc1.bootops.converge;
 
 import com.github.kirksc1.bootops.core.*;
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
+import com.github.kirksc1.bootops.core.system.SystemExecutor;
 import com.github.kirksc1.bootops.validate.ItemValidationExecutor;
 import com.github.kirksc1.bootops.validate.ItemValidationResult;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import java.util.function.Predicate;
 public class ConvergeItemStreamCommand extends BaseItemStreamCommand {
     public static final String COMMAND_NAME = "converge";
 
+    private final SystemExecutor systemExecutor;
     private final ItemInitializationExecutor initializationExecutor;
     private final ItemValidationExecutor validationExecutor;
     private final ItemConvergeExecutor convergeExecutor;
@@ -46,20 +48,39 @@ public class ConvergeItemStreamCommand extends BaseItemStreamCommand {
      * @param filters A List of Item filters that should be applied to the stream, in which only items that
      *                pass the filter test will be processed by the command.
      * @param publisher An application event publisher for publishing command lifecycle events.
+     * @param systemExecutor A SystemExecutor used to manage the System.
      * @param initializationExecutor An InitializationExecutor used to initialize the Item.
      * @param validationExecutor A ValidationExecutor used to validate the Item.
      * @param convergeExecutor A ConvergeExecutor used to converge the Item.
      */
-    public ConvergeItemStreamCommand(ItemManifestReader reader, ItemManifestParser parser, List<Predicate<Item>> filters, ApplicationEventPublisher publisher, ItemInitializationExecutor initializationExecutor, ItemValidationExecutor validationExecutor, ItemConvergeExecutor convergeExecutor) {
+    public ConvergeItemStreamCommand(ItemManifestReader reader, ItemManifestParser parser, List<Predicate<Item>> filters, ApplicationEventPublisher publisher, SystemExecutor systemExecutor, ItemInitializationExecutor initializationExecutor, ItemValidationExecutor validationExecutor, ItemConvergeExecutor convergeExecutor) {
         super(COMMAND_NAME, reader, parser, filters, publisher);
 
+        Assert.notNull(systemExecutor, "The SystemExecutor provided was null");
         Assert.notNull(initializationExecutor, "The ItemInitializationExecutor provided was null");
         Assert.notNull(validationExecutor, "The ItemValidationExecutor provided was null");
         Assert.notNull(convergeExecutor, "The ItemConvergeExecutor provided was null");
 
+        this.systemExecutor = systemExecutor;
         this.initializationExecutor = initializationExecutor;
         this.validationExecutor = validationExecutor;
         this.convergeExecutor = convergeExecutor;
+    }
+
+    @Override
+    protected ExecutionResult start(StreamContext context) {
+        systemExecutor.initiateSystem();
+
+        return super.start(context);
+    }
+
+    @Override
+    protected ExecutionResult complete(StreamContext context) {
+        ExecutionResult retVal = super.complete(context);
+
+        systemExecutor.completeSystem();
+
+        return retVal;
     }
 
     /**
@@ -80,15 +101,15 @@ public class ConvergeItemStreamCommand extends BaseItemStreamCommand {
         validationExecutor.completeValidation(item, result);
 
         if (result.isValid()) {
+            log.debug("Validation succeeded on item, name={}", item.getName());
             convergeExecutor.initiateConverge(item);
             convergeExecutor.completeConverge(item);
             retVal = super.execute(item, parameters, context);
-            log.debug("Validation succeeded on item, name={}", item.getName());
         } else {
+            log.info("Validation failed on item, name={}", item.getName());
             BaseItemCommandResult itemCommandResult = new BaseItemCommandResult();
             itemCommandResult.setSuccessful(false);
             retVal = itemCommandResult;
-            log.info("Validation failed on item, name={}", item.getName());
         }
 
         return retVal;

@@ -19,6 +19,7 @@ import com.github.kirksc1.bootops.core.Item;
 import com.github.kirksc1.bootops.core.ItemManifestParser;
 import com.github.kirksc1.bootops.core.ItemManifestReader;
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
+import com.github.kirksc1.bootops.core.system.SystemExecutor;
 import com.github.kirksc1.bootops.validate.ItemValidationExecutor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -42,10 +43,11 @@ public class BootOpsConvergeAutoConfiguration {
             ItemManifestParser parser,
             List<Predicate<Item>> filters,
             ApplicationEventPublisher publisher,
+            SystemExecutor systemExecutor,
             ItemInitializationExecutor initializationExecutor,
             ItemValidationExecutor validationExecutor,
             ItemConvergeExecutor convergeExecutor) {
-        return new ConvergeItemStreamCommand(reader, parser, filters, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        return new ConvergeItemStreamCommand(reader, parser, filters, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
     }
 
     /**

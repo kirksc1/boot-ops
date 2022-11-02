@@ -17,6 +17,7 @@ package com.github.kirksc1.bootops.converge;
 
 import com.github.kirksc1.bootops.core.*;
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
+import com.github.kirksc1.bootops.core.system.SystemExecutor;
 import com.github.kirksc1.bootops.validate.ItemValidationExecutor;
 import com.github.kirksc1.bootops.validate.ItemValidationResult;
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +45,7 @@ class ConvergeItemStreamCommandTest {
     private Predicate<Item> filter = mock(Predicate.class);
     private ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
     private StreamContext context = mock(StreamContext.class);
+    private SystemExecutor systemExecutor = mock(SystemExecutor.class);
     private ItemInitializationExecutor initializationExecutor = mock(ItemInitializationExecutor.class);
     private ItemValidationExecutor validationExecutor = mock(ItemValidationExecutor.class);
     private ItemConvergeExecutor convergeExecutor = mock(ItemConvergeExecutor.class);
@@ -54,14 +56,14 @@ class ConvergeItemStreamCommandTest {
     @BeforeEach
     public void beforeEach() {
         reset(reader, parser, filter, publisher, context);
-        reset(initializationExecutor, validationExecutor, convergeExecutor);
+        reset(systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
         reset(inputStream, item);
     }
 
     @Test
     public void testConstructor_whenNullReader_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ConvergeItemStreamCommand(null, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+            new ConvergeItemStreamCommand(null, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
         });
 
         Assertions.assertEquals("The ItemManifestReader provided was null", thrown.getMessage());
@@ -70,7 +72,7 @@ class ConvergeItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullParser_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ConvergeItemStreamCommand(reader, null, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+            new ConvergeItemStreamCommand(reader, null, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
         });
 
         Assertions.assertEquals("The ItemManifestParser provided was null", thrown.getMessage());
@@ -79,16 +81,25 @@ class ConvergeItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullPublisher_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ConvergeItemStreamCommand(reader, parser, null, null, initializationExecutor, validationExecutor, convergeExecutor);
+            new ConvergeItemStreamCommand(reader, parser, null, null, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
         });
 
         Assertions.assertEquals("The ApplicationEventPublisher provided was null", thrown.getMessage());
     }
 
     @Test
+    public void testConstructor_whenNullSystemExecutor_thenThrowIllegalArgumentException() {
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new ConvergeItemStreamCommand(reader, parser, null, publisher, null, initializationExecutor, validationExecutor, convergeExecutor);
+        });
+
+        Assertions.assertEquals("The SystemExecutor provided was null", thrown.getMessage());
+    }
+
+    @Test
     public void testConstructor_whenNullItemInitializationExecutor_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ConvergeItemStreamCommand(reader, parser, null, publisher, null, validationExecutor, convergeExecutor);
+            new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, null, validationExecutor, convergeExecutor);
         });
 
         Assertions.assertEquals("The ItemInitializationExecutor provided was null", thrown.getMessage());
@@ -97,7 +108,7 @@ class ConvergeItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullItemValidationExecutor_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, null, convergeExecutor);
+            new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, null, convergeExecutor);
         });
 
         Assertions.assertEquals("The ItemValidationExecutor provided was null", thrown.getMessage());
@@ -106,7 +117,7 @@ class ConvergeItemStreamCommandTest {
     @Test
     public void testConstructor_whenNullItemConvergeExecutor_thenThrowIllegalArgumentException() {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, null);
+            new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, null);
         });
 
         Assertions.assertEquals("The ItemConvergeExecutor provided was null", thrown.getMessage());
@@ -124,7 +135,7 @@ class ConvergeItemStreamCommandTest {
         when(validationResult.isValid()).thenReturn(true);
         when(validationExecutor.initiateValidation(same(item))).thenReturn(validationResult);
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
@@ -135,6 +146,9 @@ class ConvergeItemStreamCommandTest {
         verify(parser, times(1)).parse(same(inputStream));
         verify(publisher, times(1)).publishEvent(any(ItemCompletedEvent.class));
         verify(publisher, times(0)).publishEvent(any(BootOpsExceptionEvent.class));
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -155,13 +169,16 @@ class ConvergeItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(initializationExecutor).initiateInitialization(same(item));
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(0)).completeInitialization(same(item));
@@ -182,13 +199,16 @@ class ConvergeItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(initializationExecutor).completeInitialization(same(item));
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -209,13 +229,16 @@ class ConvergeItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(validationExecutor).initiateValidation(same(item));
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -236,13 +259,16 @@ class ConvergeItemStreamCommandTest {
         when(parser.parse(same(inputStream))).thenReturn(item);
         doThrow(new RuntimeException("Forced Failure!")).when(validationExecutor).completeValidation(same(item), any());
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -268,13 +294,16 @@ class ConvergeItemStreamCommandTest {
 
         doThrow(new RuntimeException("Forced Failure!")).when(convergeExecutor).initiateConverge(same(item));
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -300,13 +329,16 @@ class ConvergeItemStreamCommandTest {
 
         doThrow(new RuntimeException("Forced Failure!")).when(convergeExecutor).completeConverge(same(item));
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
@@ -330,13 +362,16 @@ class ConvergeItemStreamCommandTest {
         when(validationResult.isValid()).thenReturn(false);
         when(validationExecutor.initiateValidation(same(item))).thenReturn(validationResult);
 
-        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, initializationExecutor, validationExecutor, convergeExecutor);
+        ConvergeItemStreamCommand command = new ConvergeItemStreamCommand(reader, parser, null, publisher, systemExecutor, initializationExecutor, validationExecutor, convergeExecutor);
 
         ItemStreamCommandResult result = command.execute(uriStream, new HashMap<>(), context);
 
         boolean success = result.isSuccessful();
 
         assertFalse(success);
+
+        verify(systemExecutor, times(1)).initiateSystem();
+        verify(systemExecutor, times(1)).completeSystem();
 
         verify(initializationExecutor, times(1)).initiateInitialization(same(item));
         verify(initializationExecutor, times(1)).completeInitialization(same(item));
