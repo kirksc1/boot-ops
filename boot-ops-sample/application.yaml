@@ -1,0 +1,8 @@
+logging.level:
+  #INFO: turn on debug logging to see more boot-ops detail
+  com.github.kirksc1.bootops: DEBUG
+
+boot-ops:
+  event:
+    #INFO: turn on event logging to see the event flow in the logs
+    logging.enabled: true

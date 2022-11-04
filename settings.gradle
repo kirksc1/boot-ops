@@ -4,4 +4,5 @@ include 'boot-ops-converge'
 include 'boot-ops-core'
 include 'boot-ops-jackson'
 include 'boot-ops-validate'
+include 'boot-ops-sample'
 

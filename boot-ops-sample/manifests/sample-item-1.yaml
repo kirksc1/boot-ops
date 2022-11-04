@@ -1,0 +1,4 @@
+name: sample-item-1
+attributes:
+  storage:
+    location: https://storage.service/widgets/sample-item-1
