@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+}
+
+group 'com.github.kirksc1.bootops'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    bootOps
+}
+
+dependencies {
+    //project references to ensure execution always sees the latest code
+    //change to binaries for actual boot-ops usage
+    bootOps project(":boot-ops-cli")
+    bootOps project(":boot-ops-converge")
+    bootOps project(":boot-ops-jackson")
+    bootOps project(":boot-ops-validate")
+    bootOps project(":boot-ops-sample")
+
+    implementation project(":boot-ops-core")
+    implementation project(":boot-ops-converge")
+
+    implementation("org.springframework.boot:spring-boot-starter:2.7.0")
+    implementation("javax.validation:validation-api:2.0.1.Final")
+
+    compileOnly('org.projectlombok:lombok:1.18.22')
+    annotationProcessor('org.projectlombok:lombok:1.18.22')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task validate (type: JavaExec){
+    description = "Validate items"
+    mainClass  = 'com.github.kirksc1.bootops.cli.BootOpsConsoleApplication'
+    classpath = configurations.bootOps
+    args '--command=validate'
+}
+
+task converge (type: JavaExec){
+    description = "Validate items"
+    mainClass  = 'com.github.kirksc1.bootops.cli.BootOpsConsoleApplication'
+    classpath = configurations.bootOps
+    args '--command=converge'
+}
+
