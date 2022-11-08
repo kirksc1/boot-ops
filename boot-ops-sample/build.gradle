@@ -16,10 +16,7 @@ configurations {
 dependencies {
     //project references to ensure execution always sees the latest code
     //change to binaries for actual boot-ops usage
-    bootOps project(":boot-ops-cli")
-    bootOps project(":boot-ops-converge")
-    bootOps project(":boot-ops-jackson")
-    bootOps project(":boot-ops-validate")
+    bootOps project(":")
     bootOps project(":boot-ops-sample")
 
     implementation project(":boot-ops-core")
