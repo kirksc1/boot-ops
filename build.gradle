@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'jacoco'
+    id 'maven-publish'
 }
 
 group 'com.github.kirksc1.bootops'
@@ -11,18 +12,32 @@ repositories {
 }
 
 dependencies {
+    implementation project(':boot-ops-cli')
+    implementation project(':boot-ops-converge')
+    implementation project(':boot-ops-core')
+    implementation project(':boot-ops-jackson')
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test:2.7.0')
-    testImplementation project(':boot-ops-cli')
-    testImplementation project(':boot-ops-converge')
-    testImplementation project(':boot-ops-core')
-    testImplementation project(':boot-ops-jackson')
 }
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/kirksc1/boot-ops"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 tasks.register("codeCoverageReport", JacocoReport) {
