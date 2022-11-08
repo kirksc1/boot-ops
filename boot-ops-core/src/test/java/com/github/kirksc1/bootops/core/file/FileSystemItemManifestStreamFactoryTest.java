@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -77,6 +78,7 @@ class FileSystemItemManifestStreamFactoryTest {
         List<URI> uriList = stream.collect(Collectors.toList());
 
         assertEquals(3, uriList.size());
+        Collections.sort(uriList);
         assertTrue(uriList.get(0).toString().endsWith("factory/child/child.yaml"));
         assertTrue(uriList.get(1).toString().endsWith("factory/child/grandchild/grandchild.yaml"));
         assertTrue(uriList.get(2).toString().endsWith("factory/root.yaml"));
