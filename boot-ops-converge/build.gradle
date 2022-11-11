@@ -1,15 +1,3 @@
-plugins {
-    id 'java'
-    id 'jacoco'
-    id 'maven-publish'
-}
-
-group 'com.github.kirksc1.bootops'
-version '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     implementation project(":boot-ops-core")
@@ -26,8 +14,4 @@ dependencies {
     testImplementation project(":boot-ops-jackson")
 
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
-}
-
-test {
-    useJUnitPlatform()
 }
