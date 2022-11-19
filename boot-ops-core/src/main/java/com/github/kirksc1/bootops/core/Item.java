@@ -22,6 +22,7 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * An Item represents any configurable thing within the system.
@@ -46,5 +47,5 @@ public class Item implements Serializable {
     /**
      * A Map of attribute configuration for the item.
      */
-    private final LinkedHashMap<String,Object> attributes = new LinkedHashMap<>();
+    private final Map<String,Object> attributes = new LinkedHashMap<>();
 }
