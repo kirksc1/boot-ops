@@ -3,7 +3,7 @@ dependencies {
     implementation project(":boot-ops-core")
 
     implementation("org.springframework.boot:spring-boot-starter:2.7.0")
-    implementation("javax.validation:validation-api:2.0.1.Final")
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
 
     compileOnly('org.projectlombok:lombok:1.18.22')
     annotationProcessor('org.projectlombok:lombok:1.18.22')

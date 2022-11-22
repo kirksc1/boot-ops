@@ -16,11 +16,11 @@
 package com.github.kirksc1.bootops.validate;
 
 import com.github.kirksc1.bootops.core.Item;
+import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintViolation;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
