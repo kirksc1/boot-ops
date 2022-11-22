@@ -1,6 +1,6 @@
 # Converge Command
 The 'converge' command is the core process by which the item manifest
-is applied to the appropriate infrastructure.  Boot Ops executes this 
+is applied to the appropriate infrastructure.  BootOps executes this 
 process through publishing of events to signal the start of each stage.
 Converge behavior can be added at each of these stages by implementing
 concrete applications of the 
