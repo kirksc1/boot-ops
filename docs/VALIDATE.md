@@ -1,6 +1,6 @@
 # Validate Command
 The 'validate' command is the core process by which the item manifest
-is validated, typically as Git branch valdiation pre-merge.  Boot Ops executes this 
+is validated, typically as Git branch valdiation pre-merge.  BootOps executes this 
 process through publishing of events to signal the start of each stage.
 New behavior can be added at each of these stages by implementing
 concrete applications of the 
