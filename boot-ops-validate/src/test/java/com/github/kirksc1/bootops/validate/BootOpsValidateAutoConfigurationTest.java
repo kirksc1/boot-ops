@@ -17,6 +17,7 @@ package com.github.kirksc1.bootops.validate;
 
 import com.github.kirksc1.bootops.core.BootOpsCoreAutoConfiguration;
 import com.github.kirksc1.bootops.jackson.BootOpsJacksonAutoConfiguration;
+import jakarta.validation.Validator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -33,6 +34,9 @@ class BootOpsValidateAutoConfigurationTest {
         this.contextRunner.run((context) -> {
             Assertions.assertThat(context).hasSingleBean(ItemValidationExecutor.class);
             Assertions.assertThat(context).hasSingleBean(ValidateItemStreamCommand.class);
+            Assertions.assertThat(context).hasSingleBean(Validator.class);
+            Assertions.assertThat(context).hasSingleBean(ItemBeanValidator.class);
+            Assertions.assertThat(context).hasSingleBean(ItemBeanValidationListener.class);
         });
     }
 }

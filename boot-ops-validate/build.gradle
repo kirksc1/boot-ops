@@ -4,6 +4,7 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter:2.7.0")
     implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+    implementation("org.hibernate.validator:hibernate-validator:7.0.3.Final")
 
     compileOnly('org.projectlombok:lombok:1.18.22')
     annotationProcessor('org.projectlombok:lombok:1.18.22')
@@ -14,4 +15,7 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test:2.7.0')
 
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+    testRuntimeOnly('jakarta.el:jakarta.el-api:4.0.0')
+    testRuntimeOnly('org.glassfish:jakarta.el:4.0.2')
+
 }
