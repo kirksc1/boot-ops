@@ -20,6 +20,9 @@ import com.github.kirksc1.bootops.core.ItemManifestParser;
 import com.github.kirksc1.bootops.core.ItemManifestReader;
 import com.github.kirksc1.bootops.core.init.ItemInitializationExecutor;
 import com.github.kirksc1.bootops.core.system.SystemExecutor;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 
@@ -45,6 +48,31 @@ public class BootOpsValidateAutoConfiguration {
     @Bean
     public ValidateItemStreamCommand validateItemStreamCommand(ItemManifestReader reader, ItemManifestParser parser, List<Predicate<Item>> filters, ApplicationEventPublisher publisher, SystemExecutor systemExecutor, ItemInitializationExecutor initializationExecutor, ItemValidationExecutor validationExecutor) {
         return new ValidateItemStreamCommand(reader, parser, filters, publisher, systemExecutor, initializationExecutor,validationExecutor);
+    }
+
+    /**
+     * Jakarta Validation Validator
+     */
+    @Bean
+    public Validator beanValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        return factory.getValidator();
+    }
+
+    /**
+     * Item Validator using Jakarta Validation
+     */
+    @Bean
+    public ItemBeanValidator itemBeanValidator(Validator validator) {
+        return new ItemBeanValidator(validator);
+    }
+
+    /**
+     * Listener bean to initiate Jakarta Validation on items.
+     */
+    @Bean
+    public ItemBeanValidationListener itemBeanValidationListener(ItemBeanValidator validator) {
+        return new ItemBeanValidationListener(validator);
     }
 
 }

@@ -16,9 +16,9 @@
 package com.github.kirksc1.bootops.validate;
 
 import com.github.kirksc1.bootops.core.Item;
+import jakarta.validation.ConstraintViolation;
 import org.springframework.util.Assert;
 
-import javax.validation.ConstraintViolation;
 import java.util.HashSet;
 import java.util.Set;
 
