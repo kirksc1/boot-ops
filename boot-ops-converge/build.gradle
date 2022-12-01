@@ -14,4 +14,6 @@ dependencies {
     testImplementation project(":boot-ops-jackson")
 
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+    testRuntimeOnly('jakarta.el:jakarta.el-api:4.0.0')
+    testRuntimeOnly('org.glassfish:jakarta.el:4.0.2')
 }
