@@ -33,18 +33,27 @@ configure(allprojects.findAll {it.name != 'boot-ops-sample'}) {
     }
 }
 
+ext{
+    //dependencies
+    springBootVersion = '3.5.4'
+    lombokVersion = '1.18.38'
+}
+
 dependencies {
     implementation project(':boot-ops-cli')
     implementation project(':boot-ops-converge')
     implementation project(':boot-ops-core')
     implementation project(':boot-ops-jackson')
+    implementation project(':boot-ops-validate')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     testRuntimeOnly('jakarta.el:jakarta.el-api:4.0.0')
     testRuntimeOnly('org.glassfish:jakarta.el:4.0.2')
 
-    testImplementation('org.springframework.boot:spring-boot-starter-test:2.7.0')
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$rootProject.springBootVersion")
 }
 
 tasks.register("codeCoverageReport", JacocoReport) {

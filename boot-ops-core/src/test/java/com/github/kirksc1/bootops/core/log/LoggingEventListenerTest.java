@@ -15,6 +15,7 @@
  */
 package com.github.kirksc1.bootops.core.log;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -34,21 +35,22 @@ class LoggingEventListenerTest {
     private Logger logger;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         logWatcher = new ListAppender<>();
         logWatcher.start();
 
         logger = (Logger) LoggerFactory.getLogger(LoggingEventListener.class);
         logger.addAppender(logWatcher);
+        logger.setLevel(Level.DEBUG);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         logger.detachAndStopAllAppenders();
     }
 
     @Test
-    public void testOnItemEvent_whenEventReceived_thenLogEvent() {
+    void testOnItemEvent_whenEventReceived_thenLogEvent() {
         LoggingEventListener eventListener = new LoggingEventListener();
         eventListener.onItemEvent(new ItemCompletedEvent(this, new Item()));
 
