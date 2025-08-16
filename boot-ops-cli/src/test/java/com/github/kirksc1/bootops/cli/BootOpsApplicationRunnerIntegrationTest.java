@@ -23,10 +23,10 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -35,14 +35,14 @@ import static org.mockito.Mockito.reset;
 @Import(BootOpsApplicationRunnerIntegrationTest.TestConfig.class)
 class BootOpsApplicationRunnerIntegrationTest {
 
-    @SpyBean
+    @MockitoSpyBean
     BootOpsApplicationRunner bootOpsApplicationRunner;
 
     private static ItemStreamCommandService service = mock(ItemStreamCommandService.class);
     private static ItemManifestStreamFactory factory = mock(ItemManifestStreamFactory.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         reset(service, factory);
     }
 

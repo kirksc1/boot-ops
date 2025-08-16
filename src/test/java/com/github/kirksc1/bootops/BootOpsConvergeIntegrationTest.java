@@ -1,7 +1,11 @@
 package com.github.kirksc1.bootops;
 
 import com.github.kirksc1.bootops.cli.BootOpsConsoleApplication;
+import com.github.kirksc1.bootops.converge.BootOpsConvergeAutoConfiguration;
 import com.github.kirksc1.bootops.core.AttributeType;
+import com.github.kirksc1.bootops.core.BootOpsCoreAutoConfiguration;
+import com.github.kirksc1.bootops.jackson.BootOpsJacksonAutoConfiguration;
+import com.github.kirksc1.bootops.validate.BootOpsValidateAutoConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -12,7 +16,13 @@ import java.io.Serializable;
 import java.util.List;
 
 @SpringBootTest(
-        classes = {BootOpsConsoleApplication.class},
+        classes = {
+                BootOpsConsoleApplication.class,
+                BootOpsCoreAutoConfiguration.class,
+                BootOpsConvergeAutoConfiguration.class,
+                BootOpsJacksonAutoConfiguration.class,
+                BootOpsValidateAutoConfiguration.class
+        },
         args = {"--command=converge"},
         properties = {
                 "logging.level.com.github.kirksc1=DEBUG",
@@ -20,11 +30,13 @@ import java.util.List;
                 "boot-ops.manifest-root-directory=src/test/resources"
         })
 @Import(BootOpsConvergeIntegrationTest.TestConfig.class)
-public class BootOpsConvergeIntegrationTest {
+class BootOpsConvergeIntegrationTest {
 
     @Test
-    public void testBootOps_whenSingleManifest_thenProcessOneItem() {
-
+    void testBootOps_whenSingleManifest_thenProcessOneItem() {
+        /**
+         * Execute a single manifest in an integration test without throwing an error of any kind
+         */
     }
 
     @TestConfiguration

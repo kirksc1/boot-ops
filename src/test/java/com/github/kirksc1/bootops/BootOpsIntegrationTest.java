@@ -2,6 +2,7 @@ package com.github.kirksc1.bootops;
 
 import com.github.kirksc1.bootops.cli.BootOpsConsoleApplication;
 import com.github.kirksc1.bootops.core.*;
+import com.github.kirksc1.bootops.jackson.BootOpsJacksonAutoConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,20 +21,24 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(
-        classes = {BootOpsConsoleApplication.class},
+        classes = {
+                BootOpsConsoleApplication.class,
+                BootOpsCoreAutoConfiguration.class,
+                BootOpsJacksonAutoConfiguration.class
+        },
         args = {"--command=test"},
         properties = {
                 "logging.level.com.github.kirksc1=DEBUG",
                 "boot-ops.manifest-root-directory=src/test/resources"
         })
 @Import(BootOpsIntegrationTest.TestConfig.class)
-public class BootOpsIntegrationTest {
+class BootOpsIntegrationTest {
 
     @Autowired
     private TestCommand command;
 
     @Test
-    public void testBootOps_whenSingleManifest_thenProcessOneItem() {
+    void testBootOps_whenSingleManifest_thenProcessOneItem() {
         assertEquals("my-item", command.item.getName());
 
         TestAttribute attribute = (TestAttribute) command.item.getAttributes().get("test");
