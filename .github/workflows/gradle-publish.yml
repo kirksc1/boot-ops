@@ -36,6 +36,13 @@ jobs:
       with:
         arguments: build
 
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # Recommended: Store your Codecov token as a GitHub Secret
+        files: ./build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml # Path to your generated coverage report
+        # Other optional parameters like flags, name, etc.
+
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
     - name: Publish to GitHub Packages
