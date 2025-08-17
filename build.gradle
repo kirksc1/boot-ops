@@ -58,7 +58,7 @@ dependencies {
 
 tasks.register("codeCoverageReport", JacocoReport) {
     reports {
-        xml.enabled true
+        xml.required = true
     }
     subprojects {
         subproject -> subproject.plugins.withType(JacocoPlugin).configureEach {
